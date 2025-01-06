@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.tahraoui.messaging.ui.components.Message?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.tahraoui.messaging.ui.controller.MainController">
+<!-- TODO: Implement a page switching functionality here -->
+    <top>
+        <fx:include source="pages/login.fxml" fx:id="login"/>
+    </top>
+    <center>
+        <fx:include source="pages/chatbox.fxml" fx:id="chatbox"/>
+<!--        <VBox BorderPane.alignment="CENTER" alignment="TOP_CENTER" spacing="1" style="-fx-background-color: red;">-->
+<!--            <Message text="Test"/>-->
+<!--            <Message text="Lorem ipsum dolor sit amet consectetur" received="true"/>-->
+<!--            <Message text="Test" received="true"/>-->
+<!--            <Message text="Test"/>-->
+<!--        </VBox>-->
+    </center>
+</BorderPane>

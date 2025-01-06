@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Button?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.tahraoui.messaging.ui.controller.ChatBoxController">
+    <top>
+        <Label>Title Label</Label>
+    </top>
+    <center>
+        <ScrollPane fitToWidth="true">
+            <VBox fx:id="vbox_messages" alignment="CENTER" styleClass="chat-box" spacing="5"/>
+        </ScrollPane>
+    </center>
+    <bottom>
+        <BorderPane>
+            <center>
+                <TextField fx:id="textField_message" promptText="Type your message here"/>
+            </center>
+            <right>
+                <Button fx:id="btn_send" text="Send"/>
+            </right>
+        </BorderPane>
+    </bottom>
+</BorderPane>

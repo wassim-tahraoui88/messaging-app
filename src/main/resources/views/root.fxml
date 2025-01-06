@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.BorderPane?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" styleClass="gradient-background, border-radius-20" fx:id="root"
+            fx:controller="com.tahraoui.messaging.ui.controller.RootController">
+    <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+    <top><fx:include source="header/header-view.fxml" fx:id="header"/></top>
+<!--    <left><fx:include source="sidebar/sidebar-view.fxml" fx:id="sidebar"/></left>-->
+    <center><fx:include source="content/content-view.fxml" fx:id="content"/></center>
+</BorderPane>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.geometry.Insets?>
+<?import com.tahraoui.gui.icons.old.materialdesignicons.MaterialDesignIconView?>
+<?import com.tahraoui.gui.icons.old.octicons.OctIconView?>
+<?import javafx.scene.layout.StackPane?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:id="header" fx:controller="com.tahraoui.messaging.ui.controller.HeaderController">
+    <left>
+        <Label BorderPane.alignment="CENTER" style="-fx-font-size: 28px; -fx-alignment: center; -fx-font-weight: 900;" fx:id="label">
+            <BorderPane.margin>
+                <Insets top="5" right="5" bottom="5" left="5"/>
+            </BorderPane.margin>
+        </Label>
+    </left>
+    <center>
+        <Pane BorderPane.alignment="CENTER" style="-fx-background-color: #e0e0e0; -fx-max-height: 1px;">
+            <BorderPane.margin>
+                <Insets top="5" right="5" bottom="5" left="5"/>
+            </BorderPane.margin>
+        </Pane>
+    </center>
+    <right>
+        <HBox BorderPane.alignment="CENTER" alignment="CENTER" spacing="5">
+            <BorderPane.margin>
+                <Insets top="5" right="5" bottom="5" left="5"/>
+            </BorderPane.margin>
+
+            <OctIconView glyphName="GEAR" size="28px" stroke="#ddd" fill="transparent" onClick="#onSettingsClicked"/>
+            <MaterialDesignIconView glyphName="WINDOW_MINIMIZE" fx:id="minimize" size="28px" stroke="#ddd" fill="transparent"/>
+            <StackPane>
+                <MaterialDesignIconView fx:id="maxIcon" glyphName="WINDOW_MAXIMIZE" size="28px" stroke="#ddd" fill="transparent"/>
+                <MaterialDesignIconView fx:id="restoreIcon" visible="false" glyphName="WINDOW_RESTORE" size="28px" stroke="#ddd" fill="transparent"/>
+            </StackPane>
+            <OctIconView glyphName="X" size="28px" stroke="#ddd" fill="transparent" onClick="#onExitClicked"/>
+        </HBox>
+    </right>
+
+</BorderPane>
