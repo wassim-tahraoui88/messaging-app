@@ -20,15 +20,21 @@ public class ConnectionService {
 
 		var host = new Host(port, password);
 		new Thread(host).start();
-		LOGGER.debug("Host started on port {}", port);
 		HOST_STATE = true;
+		LOGGER.debug("Host started on port {}.", port);
 	}
 	public static void join(int port, String password) {
+		if (CLIENT_STATE) {
+			LOGGER.warn("Client already connected.");
+			return;
+		}
 		try {
 			var client = new Client(port, password);
+			CLIENT_STATE = true;
+			LOGGER.debug("Connected to server on port {} with id {}.", port, client.getId());
 		}
 		catch (IOException _) {
-
+			LOGGER.error("Failed to connect to server.");
 		}
 	}
 }

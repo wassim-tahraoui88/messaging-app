@@ -13,7 +13,6 @@ import java.net.Socket;
 
 public class ClientListener implements Runnable {
 
-
 	private static final Logger LOGGER = LogManager.getLogger(ClientListener.class.getName());
 
 	private final Socket socket;
@@ -29,13 +28,16 @@ public class ClientListener implements Runnable {
 
 	public ConnectionResponse connect(String password) {
 		try {
+			LOGGER.debug("Sending connection request...");
 			this.writer.writeObject(new ConnectionRequest(password));
 			this.writer.flush();
+			LOGGER.debug("Connection request sent.");
 
+			LOGGER.debug("Waiting for connection response...");
 			return (ConnectionResponse) this.reader.readObject();
 		}
 		catch (IOException | ClassNotFoundException _) {
-			System.out.println("Failed to read connection request.");
+			LOGGER.error("Failed to read connection request...");
 			closeResources();
 		}
 		return null;

@@ -28,16 +28,20 @@ public class ClientHandler implements Runnable {
 		this.reader = new ObjectInputStream(socket.getInputStream());
 		this.writer = new ObjectOutputStream(socket.getOutputStream());
 		this.writer.flush();
-
 		if (!connect(password, new ConnectionResponse(writer.hashCode(), p, g))) throw new IOException();
 	}
 
 	private boolean connect(String password, ConnectionResponse response) {
 		try {
+			LOGGER.debug("Waiting for connection request...");
 			var request = (ConnectionRequest) this.reader.readObject();
+			LOGGER.debug("Connection request received.");
 			if (request == null || request.password().equals(password)) throw new IOException();
+			LOGGER.debug("Connection request accepted.");
+			LOGGER.debug("Sending connection response...");
 			this.writer.writeObject(response);
 			this.writer.flush();
+			LOGGER.debug("Connection response sent.");
 			return true;
 		}
 		catch (IOException | ClassNotFoundException _) {
