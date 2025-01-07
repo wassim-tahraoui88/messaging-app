@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import com.tahraoui.messaging.ui.components.NumberField?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Separator?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.tahraoui.messaging.ui.controller.LoginController">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    <center>
+        <HBox alignment="CENTER" spacing="10">
+            <VBox alignment="CENTER" spacing="10">
+                <Label styleClass="title">Host a new chat server</Label>
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label>Port Number (Between 1 and 65535):</Label>
+                    <BorderPane>
+                        <center>
+                            <NumberField fx:id="numberField_hostPort" promptText="8080..." prefColumnCount="8"/>
+                        </center>
+                        <right>
+                            <Button fx:id="button_hostPortVerify" text="Verify"/>
+                        </right>
+                    </BorderPane>
+                </VBox>
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label>Password:</Label>
+                    <PasswordField fx:id="passwordField_hostPassword" promptText="Enter chat password..."/>
+                </VBox>
+                <HBox spacing="5" alignment="CENTER">
+                    <Button fx:id="button_host" HBox.hgrow="ALWAYS" text="Host"/>
+                </HBox>
+            </VBox>
+            <Separator orientation="VERTICAL"/>
+            <VBox alignment="CENTER" spacing="10">
+                <Label styleClass="title">Join an existing chat server</Label>
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label>Port Number (Between 1 and 65535):</Label>
+                    <NumberField fx:id="numberField_joinPort" promptText="8080..." prefColumnCount="8"/>
+                </VBox>
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label>Password:</Label>
+                    <PasswordField fx:id="passwordField_joinPassword" promptText="Enter chat password..."/>
+                </VBox>
+                <Button fx:id="button_join" text="Join" textAlignment="CENTER"/>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>
