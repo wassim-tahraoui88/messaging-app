@@ -1,20 +1,21 @@
 package com.tahraoui.messaging.backend.host;
 
-import com.tahraoui.messaging.backend.data.response.ConnectionResponse;
-
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.security.SecureRandom;
 
 public class Host implements Runnable {
+
 	private static final int BIT_LENGTH = 2048;
 
 	private final int port;
+	private final String password;
+	private final ClientRequestHandler requestHandler;
+
 	private final BigInteger p, g;
 	private final BigInteger privateKey, publicKey;
 	private BigInteger sharedKey;
-	private final String password;
 
 	public Host(int port, String password) {
 		var random = new SecureRandom();
@@ -25,20 +26,27 @@ public class Host implements Runnable {
 
 		this.port = port;
 		this.password = password;
+		this.requestHandler = new ClientRequestHandler();
 	}
-
 	public void computeSharedKey(BigInteger clientPublicKey) {
 		this.sharedKey = clientPublicKey.modPow(privateKey, p);
 
 	}
 
-
 	@Override public void run() {
 		try (var serverSocket = new ServerSocket(port)) {
 			while (!serverSocket.isClosed()) {
 				var socket = serverSocket.accept();
-				var clientHandler = new ClientHandler(socket, password, new ConnectionResponse(p, g));
-				new Thread(clientHandler).start();
+				try {
+					var clientHandler = new ClientHandler(socket, password, p, g);
+					clientHandler.setRequestHandler(requestHandler);
+					var writer = clientHandler.getWriter();
+					requestHandler.add(writer.hashCode(), writer);
+					new Thread(clientHandler).start();
+				}
+				catch (IOException _) {
+					socket.close();
+				}
 			}
 		}
 		catch (IOException _) {
@@ -46,9 +54,9 @@ public class Host implements Runnable {
 		}
 	}
 
-	public BigInteger getP() { return p; }
-	public BigInteger getG() { return g; }
-	public BigInteger getPrivateKey() { return privateKey; }
+//	public BigInteger getP() { return p; }
+//	public BigInteger getG() { return g; }
+//	public BigInteger getPrivateKey() { return privateKey; }
 	public BigInteger getPublicKey() { return publicKey; }
 	public BigInteger getSharedKey() { return sharedKey; }
 }

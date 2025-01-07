@@ -10,14 +10,16 @@ import static com.tahraoui.messaging.util.NetworkUtils.SERVER_NAME;
 
 public class Client {
 
+	private final int id;
 	private final BigInteger privateKey, publicKey;
 	private BigInteger sharedKey;
 
-	public Client( int port, String password) throws IOException {
+	public Client(int port, String password) throws IOException {
 		var socket = new Socket(InetAddress.getByName(SERVER_NAME), port);
 		var listener = new ClientListener(socket);
 		var connection = listener.connect(password);
-		if (connection == null) throw new RuntimeException("");
+		if (connection == null) throw new RuntimeException("Failed to connect to server.");
+		this.id = connection.id();
 
 		var random = new SecureRandom();
 		this.privateKey = new BigInteger(connection.p().bitLength(), random);
@@ -31,6 +33,7 @@ public class Client {
 
 	}
 
+	public int getId() { return id; }
 	public BigInteger getPrivateKey() { return privateKey; }
 	public BigInteger getPublicKey() { return publicKey; }
 	public BigInteger getSharedKey() { return sharedKey; }

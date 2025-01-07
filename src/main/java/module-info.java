@@ -7,13 +7,11 @@ module com.tahraoui.messaging {
 	requires com.dlsc.formsfx;
 	requires net.synedra.validatorfx;
 
-	requires java.desktop;
-	requires org.apache.logging.log4j;
 	requires batik.util;
 	requires batik.dom;
 	requires commons.logging;
 	requires java.net.http;
-	requires java.logging;
+	requires org.apache.logging.log4j.core;
 
 	opens com.tahraoui.messaging to javafx.fxml;
 	opens com.tahraoui.messaging.ui.controller to javafx.fxml;

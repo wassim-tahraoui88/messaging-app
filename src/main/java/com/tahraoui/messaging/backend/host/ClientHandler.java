@@ -1,40 +1,35 @@
 package com.tahraoui.messaging.backend.host;
 
+import com.tahraoui.messaging.backend.data.RequestHandler;
 import com.tahraoui.messaging.backend.data.request.ConnectionRequest;
 import com.tahraoui.messaging.backend.data.request.SerializableRequest;
 import com.tahraoui.messaging.backend.data.response.ConnectionResponse;
-import com.tahraoui.messaging.backend.data.response.SerializableResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.math.BigInteger;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ClientHandler implements Runnable {
 
 	private static final Logger LOGGER = LogManager.getLogger(ClientHandler.class.getName());
-	public static final List<ClientHandler> HANDLERS = new ArrayList<>(10);
 
 	private final Socket socket;
 	private final ObjectInputStream reader;
 	private final ObjectOutputStream writer;
+	private RequestHandler requestHandler;
 
-	public ClientHandler(Socket socket, String password, ConnectionResponse connectionResponse) throws IOException {
+	public ClientHandler(Socket socket, String password, BigInteger p, BigInteger g) throws IOException {
 		this.socket = socket;
 		this.reader = new ObjectInputStream(socket.getInputStream());
 		this.writer = new ObjectOutputStream(socket.getOutputStream());
 		this.writer.flush();
 
-		if (!connect(password, connectionResponse)) {
-			socket.close();
-			return;
-		}
-
-		HANDLERS.add(this);
+		if (!connect(password, new ConnectionResponse(writer.hashCode(), p, g))) throw new IOException();
 	}
 
 	private boolean connect(String password, ConnectionResponse response) {
@@ -54,17 +49,6 @@ public class ClientHandler implements Runnable {
 		return false;
 	}
 
-	private void broadcastResponse(SerializableResponse response) {
-		for (var handler : HANDLERS) {
-			try {
-				handler.writer.writeObject(response);
-				handler.writer.flush();
-			}
-			catch (IOException _) {
-				LOGGER.error("Failed to send response to client {}.", handler);
-			}
-		}
-	}
 
 	@Override public void run() {
 		try {
@@ -76,16 +60,17 @@ public class ClientHandler implements Runnable {
 	}
 
 	private void handleRequest() {
+		if (requestHandler == null) return;
 		try {
 			var request = reader.readObject();
-			if (!(request instanceof SerializableRequest)) return;
+			if (!(request instanceof SerializableRequest _request)) return;
 
+			requestHandler.handleRequest(_request);
 		}
 		catch (IOException | ClassNotFoundException e) {
 			closeSocket();
 		}
 	}
-
 	private void closeSocket() {
 		try {
 			socket.close();
@@ -103,4 +88,7 @@ public class ClientHandler implements Runnable {
 			LOGGER.fatal("Failed to close resources", e);
 		}
 	}
+
+	public ObjectOutput getWriter() { return writer; }
+	public void setRequestHandler(RequestHandler requestHandler) { this.requestHandler = requestHandler; }
 }

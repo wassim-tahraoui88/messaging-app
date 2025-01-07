@@ -13,6 +13,7 @@ import java.net.Socket;
 
 public class ClientListener implements Runnable {
 
+
 	private static final Logger LOGGER = LogManager.getLogger(ClientListener.class.getName());
 
 	private final Socket socket;
