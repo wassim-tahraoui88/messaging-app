@@ -11,7 +11,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 
-public class LoginController {
+public class HomeController {
 
 	@FXML private NumberField numberField_hostPort, numberField_joinPort;
 	@FXML private PasswordField passwordField_hostPassword, passwordField_joinPassword;

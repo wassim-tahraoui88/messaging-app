@@ -12,6 +12,7 @@ public class ConnectionService {
 
 	public static void host(int port, String password) {
 		var host = new Host(port, password);
+		new Thread(host).start();
 		LOGGER.debug("Host started on port {}", port);
 
 	}

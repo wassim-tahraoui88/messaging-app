@@ -10,7 +10,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Separator?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.tahraoui.messaging.ui.controller.LoginController">
+            fx:controller="com.tahraoui.messaging.ui.controller.HomeController">
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
