@@ -46,8 +46,9 @@ public class Host implements Runnable {
 					var clientHandler = new ClientHandler(socket, password, p, g);
 					clientHandler.setRequestHandler(requestHandler);
 					var writer = clientHandler.getWriter();
+					var threadName = "ClientHandler Thread - [%d]".formatted(writer.hashCode());
 					requestHandler.add(writer.hashCode(), writer);
-					new Thread(clientHandler).start();
+					new Thread(clientHandler, threadName).start();
 				}
 				catch (IOException _) {
 					socket.close();
@@ -59,9 +60,9 @@ public class Host implements Runnable {
 		}
 	}
 
-//	public BigInteger getP() { return p; }
-//	public BigInteger getG() { return g; }
-//	public BigInteger getPrivateKey() { return privateKey; }
+	public BigInteger getP() { return p; }
+	public BigInteger getG() { return g; }
+	public BigInteger getPrivateKey() { return privateKey; }
 	public BigInteger getPublicKey() { return publicKey; }
 	public BigInteger getSharedKey() { return sharedKey; }
 }

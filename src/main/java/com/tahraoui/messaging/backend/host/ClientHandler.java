@@ -61,10 +61,10 @@ public class ClientHandler implements Runnable {
 		return false;
 	}
 
-
 	@Override public void run() {
 		try {
 			while (socket.isConnected() && !socket.isClosed()) handleRequest();
+			LOGGER.warn("Client with id {} has disconnected.", writer.hashCode());
 		}
 		finally {
 			closeResources();

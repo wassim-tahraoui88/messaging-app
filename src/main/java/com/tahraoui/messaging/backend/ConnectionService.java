@@ -21,7 +21,7 @@ public class ConnectionService {
 		}
 
 		var host = new Host(port, password);
-		new Thread(host).start();
+		new Thread(host,"Thread - Host").start();
 		HOST_STATE = true;
 		LOGGER.debug("Host started on port {}.", port);
 	}
@@ -44,6 +44,5 @@ public class ConnectionService {
 		catch (IOException _) {
 			LOGGER.fatal("An error has occurred while connecting.");
 		}
-
 	}
 }
