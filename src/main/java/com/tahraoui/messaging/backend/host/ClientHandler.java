@@ -4,6 +4,10 @@ import com.tahraoui.messaging.backend.data.RequestHandler;
 import com.tahraoui.messaging.backend.data.request.ConnectionRequest;
 import com.tahraoui.messaging.backend.data.request.SerializableRequest;
 import com.tahraoui.messaging.backend.data.response.ConnectionResponse;
+import com.tahraoui.messaging.model.exception.AppException;
+import com.tahraoui.messaging.model.exception.ReadingFailedException;
+import com.tahraoui.messaging.model.exception.WritingFailedException;
+import com.tahraoui.messaging.model.exception.WrongPasswordException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,9 +15,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
+import java.io.StreamCorruptedException;
 import java.math.BigInteger;
 import java.net.Socket;
-import java.security.InvalidKeyException;
 
 public class ClientHandler implements Runnable {
 
@@ -24,15 +29,16 @@ public class ClientHandler implements Runnable {
 	private final ObjectOutputStream writer;
 	private RequestHandler requestHandler;
 
-	public ClientHandler(Socket socket, String password, BigInteger p, BigInteger g) throws IOException {
+	public ClientHandler(Socket socket, String password, BigInteger p, BigInteger g) throws AppException, IOException {
 		this.socket = socket;
 		this.reader = new ObjectInputStream(socket.getInputStream());
 		this.writer = new ObjectOutputStream(socket.getOutputStream());
 		this.writer.flush();
-		if (!connect(password, new ConnectionResponse(writer.hashCode(), p, g))) throw new IOException();
+		connect(password, new ConnectionResponse(writer.hashCode(), p, g));
 	}
 
-	private boolean connect(String password, ConnectionResponse response) {
+	private void connect(String password, ConnectionResponse response) throws AppException {
+		var success = false;
 		try {
 			LOGGER.debug("Waiting for connection request...");
 			var request = (ConnectionRequest) this.reader.readObject();
@@ -40,25 +46,27 @@ public class ClientHandler implements Runnable {
 			if (request == null || !request.password().equals(password)) {
 				writer.writeObject(new ConnectionResponse(-1, null, null));
 				writer.flush();
-				throw new InvalidKeyException();
+				throw new WrongPasswordException();
 			}
 			LOGGER.debug("Connection request accepted.");
 			LOGGER.debug("Sending connection response...");
 			this.writer.writeObject(response);
 			this.writer.flush();
+			success = true;
 			LOGGER.debug("Connection response sent.");
-			return true;
 		}
-		catch (IOException | ClassNotFoundException _) {
-			LOGGER.error("Failed to read/write connection.");
+		catch (ClassNotFoundException | StreamCorruptedException | OptionalDataException _) {
+			throw new ReadingFailedException();
 		}
-		catch (InvalidKeyException e) {
-			LOGGER.error("Wrong password.");
+		catch (IOException _) {
+			throw new WritingFailedException();
 		}
-
-		closeResources();
-		closeSocket();
-		return false;
+		finally {
+			if (!success) {
+				closeResources();
+				closeSocket();
+			}
+		}
 	}
 
 	@Override public void run() {

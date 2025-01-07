@@ -1,5 +1,6 @@
 package com.tahraoui.messaging.backend.host;
 
+import com.tahraoui.messaging.model.exception.AppException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,13 +51,16 @@ public class Host implements Runnable {
 					requestHandler.add(writer.hashCode(), writer);
 					new Thread(clientHandler, threadName).start();
 				}
-				catch (IOException _) {
-					socket.close();
+				catch (AppException e) {
+					LOGGER.error(e.getMessage());
+				}
+				catch (IOException e) {
+					LOGGER.fatal("An internal error has occurred while establishing connection: {}.", e.getMessage());
 				}
 			}
 		}
 		catch (IOException _) {
-			System.out.println("Server closed.");
+			LOGGER.error("Server is shutdown.");
 		}
 	}
 
