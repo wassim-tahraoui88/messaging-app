@@ -13,6 +13,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.net.Socket;
+import java.security.InvalidKeyException;
 
 public class ClientHandler implements Runnable {
 
@@ -36,7 +37,7 @@ public class ClientHandler implements Runnable {
 			LOGGER.debug("Waiting for connection request...");
 			var request = (ConnectionRequest) this.reader.readObject();
 			LOGGER.debug("Connection request received.");
-			if (request == null || !request.password().equals(password)) throw new IOException("Invalid password.");
+			if (request == null || !request.password().equals(password)) throw new InvalidKeyException("Invalid password.");
 			LOGGER.debug("Connection request accepted.");
 			LOGGER.debug("Sending connection response...");
 			this.writer.writeObject(response);
@@ -45,7 +46,10 @@ public class ClientHandler implements Runnable {
 			return true;
 		}
 		catch (IOException | ClassNotFoundException _) {
-			LOGGER.error("Failed to read connection request.");
+			LOGGER.error("Failed to read/write connection.");
+		}
+		catch (InvalidKeyException e) {
+			LOGGER.error("Wrong password.");
 		}
 
 		closeResources();
