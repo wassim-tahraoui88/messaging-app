@@ -37,7 +37,11 @@ public class ClientHandler implements Runnable {
 			LOGGER.debug("Waiting for connection request...");
 			var request = (ConnectionRequest) this.reader.readObject();
 			LOGGER.debug("Connection request received.");
-			if (request == null || !request.password().equals(password)) throw new InvalidKeyException("Invalid password.");
+			if (request == null || !request.password().equals(password)) {
+				writer.writeObject(new ConnectionResponse(-1, null, null));
+				writer.flush();
+				throw new InvalidKeyException();
+			}
 			LOGGER.debug("Connection request accepted.");
 			LOGGER.debug("Sending connection response...");
 			this.writer.writeObject(response);

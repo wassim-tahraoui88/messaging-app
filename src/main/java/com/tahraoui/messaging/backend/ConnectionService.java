@@ -6,6 +6,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.security.InvalidKeyException;
 
 public class ConnectionService {
 	private static final Logger LOGGER = LogManager.getLogger(ConnectionService.class.getName());
@@ -33,8 +35,15 @@ public class ConnectionService {
 			CLIENT_STATE = true;
 			LOGGER.debug("Connected to server on port {} with id {}.", port, client.getId());
 		}
-		catch (IOException _) {
-			LOGGER.error("Failed to connect to server.");
+		catch (ConnectException _) {
+			LOGGER.error("Connection failed.");
 		}
+		catch (InvalidKeyException e) {
+			LOGGER.error("Wrong password.");
+		}
+		catch (IOException _) {
+			LOGGER.fatal("An error has occurred while connecting.");
+		}
+
 	}
 }
