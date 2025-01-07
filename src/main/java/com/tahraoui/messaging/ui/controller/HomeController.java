@@ -22,18 +22,19 @@ public class HomeController {
 		portStatus.setContentDisplay(ContentDisplay.TOP);
 		portStatus.setShowDuration(Duration.seconds(2));
 		portStatus.setAutoHide(true);
-		button_hostPortVerify.setOnAction(_ -> verifyPort());
+		button_hostPortVerify.setOnAction(_ -> handleVerifyPort());
 
 		button_host.setOnAction(_ -> handleHost());
 		button_join.setOnAction(_ -> handleJoin());
 	}
 
-	private void verifyPort() {
+	private boolean verifyPort() {
 		var port = numberField_hostPort.getText();
-		if (port.isBlank()) portStatus.setText("Port number is required...");
-		else if (!NetworkUtils.isPortAvailable(Integer.parseInt(port))) portStatus.setText("Invalid port number...");
-		else portStatus.setText("Port number is valid...");
-
+		return !port.isBlank() && NetworkUtils.isPortAvailable(Integer.parseInt(port));
+	}
+	private void handleVerifyPort() {
+		portStatus.hide();
+		portStatus.setText( verifyPort() ? "Port number is valid." :"Invalid port number...");
 		var screenPosition = button_hostPortVerify.localToScreen(button_hostPortVerify.getBoundsInLocal());
 		portStatus.show(button_hostPortVerify, screenPosition.getMaxX(), screenPosition.getMinY());
 	}
@@ -44,7 +45,10 @@ public class HomeController {
 			ModalFactory.showError("Connection Error","Please fill in all fields...");
 			return;
 		}
-		ConnectionService.host(Integer.parseInt(port), password);
+		var portNumber = Integer.parseInt(port);
+
+		if (verifyPort()) ConnectionService.host(portNumber, password);
+		else ModalFactory.showWarning("Connection Warning","Port number is invalid...");
 	}
 	private void handleJoin() {
 		var port = numberField_joinPort.getText();

@@ -1,5 +1,8 @@
 package com.tahraoui.messaging.backend.host;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.ServerSocket;
@@ -7,6 +10,7 @@ import java.security.SecureRandom;
 
 public class Host implements Runnable {
 
+	private static final Logger LOGGER = LogManager.getLogger(Host.class);
 	private static final int BIT_LENGTH = 2048;
 
 	private final int port;
@@ -38,6 +42,7 @@ public class Host implements Runnable {
 			while (!serverSocket.isClosed()) {
 				var socket = serverSocket.accept();
 				try {
+					LOGGER.debug("Server listening on port {}.", socket.getInetAddress());
 					var clientHandler = new ClientHandler(socket, password, p, g);
 					clientHandler.setRequestHandler(requestHandler);
 					var writer = clientHandler.getWriter();
