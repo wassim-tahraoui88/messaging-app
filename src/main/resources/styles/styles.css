@@ -18,17 +18,24 @@
   -fx-padding: 5;
 }
 .chat-box .system-message {
+  -fx-alignment: center;
+}
+.chat-box .system-message .message {
   -fx-font-size: 16;
+  -fx-font-style: italic;
   -fx-text-fill: gray;
+  -fx-alignment: center;
+  -fx-text-alignment: center;
 }
 .chat-box .message-container .sender {
   -fx-font-size: 12;
   -fx-text-fill: gray;
 }
 .chat-box .message-container .message-box .message {
-  -fx-padding: 5;
+  -fx-padding: 10;
   -fx-border-width: 1;
-  -fx-min-width: 8;
+  -fx-min-width: 12;
+  -fx-font-size: 20;
 }
 .chat-box .message-container.sent .message-box {
   -fx-alignment: center-right;

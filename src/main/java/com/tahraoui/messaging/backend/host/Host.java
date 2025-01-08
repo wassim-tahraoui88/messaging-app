@@ -51,9 +51,8 @@ public class Host implements Runnable, RequestWriter, ResponseReader {
 				var socket = serverSocket.accept();
 				try {
 					LOGGER.info("Received connection from {}.", socket.getInetAddress());
-					var handler = new ClientHandler(socket, password, p, g);
-					handler.setDisconnectionListener((id) -> requestHandler.remove(id));
-					handler.setRequestWriter(requestHandler);
+					var handler = new ClientHandler(socket, password, requestHandler, p, g);
+					handler.setDisconnectionListener(requestHandler::remove);
 					var id = handler.getId();
 					var threadName = "ClientHandler Thread - [%d]".formatted(id);
 					requestHandler.add(id, handler.getWriter());

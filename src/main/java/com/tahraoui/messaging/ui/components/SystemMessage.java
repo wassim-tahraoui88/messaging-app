@@ -18,9 +18,9 @@ public class SystemMessage extends HBox {
 	public SystemMessage() {
 		this.label = new Label();
 		this.label.setWrapText(true);
-		this.label.getStyleClass().add("sender");
+		this.label.getStyleClass().add("message");
 
-		this.getStyleClass().add("system-content");
+		this.getStyleClass().add("system-message");
 
 		getChildren().add(label);
 		initProperties();

@@ -31,14 +31,16 @@ public class ClientHandler implements Runnable {
 	private final Socket socket;
 	private final ObjectInputStream reader;
 	private final ObjectOutputStream writer;
-	private RequestWriter requestWriter;
+	private final RequestWriter requestWriter;
 	private DisconnectionListener disconnectionListener;
 
-	public ClientHandler(Socket socket, String password, BigInteger p, BigInteger g) throws AppException, IOException {
+	public ClientHandler(Socket socket, String password, RequestWriter requestWriter, BigInteger p, BigInteger g) throws AppException, IOException {
 		this.socket = socket;
 		this.reader = new ObjectInputStream(socket.getInputStream());
 		this.writer = new ObjectOutputStream(socket.getOutputStream());
 		this.writer.flush();
+
+		this.requestWriter = requestWriter;
 
 		var request = connect(password, new ConnectionResponse(p, g,true));
 		this.id = request.id();
@@ -56,6 +58,7 @@ public class ClientHandler implements Runnable {
 			}
 			this.writer.writeObject(response);
 			this.writer.flush();
+			this.requestWriter.writeRequest(new SystemMessageRequest("%s [%d] has joined the chat.".formatted(username, id)));
 			success = true;
 			return request;
 		}
@@ -123,6 +126,5 @@ public class ClientHandler implements Runnable {
 
 	public int getId() { return id; }
 	public ObjectOutput getWriter() { return writer; }
-	public void setRequestWriter(RequestWriter requestWriter) { this.requestWriter = requestWriter; }
 	public void setDisconnectionListener(DisconnectionListener disconnectionListener) { this.disconnectionListener = disconnectionListener; }
 }
