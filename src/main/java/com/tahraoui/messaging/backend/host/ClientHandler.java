@@ -45,6 +45,7 @@ public class ClientHandler implements Runnable {
 		var request = connect(password, new ConnectionResponse(p, g,true));
 		this.id = request.id();
 		this.username = request.username();
+		this.requestWriter.writeRequest(new SystemMessageRequest("%s [%d] has joined the chat.".formatted(username, id)));
 	}
 
 	private ConnectionRequest connect(String password, ConnectionResponse response) throws AppException {
@@ -58,7 +59,6 @@ public class ClientHandler implements Runnable {
 			}
 			this.writer.writeObject(response);
 			this.writer.flush();
-			this.requestWriter.writeRequest(new SystemMessageRequest("%s [%d] has joined the chat.".formatted(username, id)));
 			success = true;
 			return request;
 		}
