@@ -4,8 +4,10 @@ import com.tahraoui.messaging.backend.data.RequestWriter;
 import com.tahraoui.messaging.backend.data.ResponseReader;
 import com.tahraoui.messaging.backend.data.request.MessageRequest;
 import com.tahraoui.messaging.backend.data.request.SerializableRequest;
+import com.tahraoui.messaging.backend.data.request.SystemMessageRequest;
 import com.tahraoui.messaging.backend.data.response.MessageResponse;
 import com.tahraoui.messaging.backend.data.response.SerializableResponse;
+import com.tahraoui.messaging.backend.data.response.SystemMessageResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,10 +27,23 @@ public class ClientRequestHandler implements RequestWriter {
 
 	}
 
-	public void add(Integer id, ObjectOutput handler) { writers.put(id, handler); }
+	public void add(int id, ObjectOutput handler) { writers.put(id, handler); }
+	public void remove(int id) {
+		var writer = writers.remove(id);
+		if (writer != null) {
+			try {
+				writer.close();
+			}
+			catch (IOException _) { }
+		}
+	}
 
 	private void handleMessageRequest(MessageRequest request) {
 		var response = new MessageResponse(request.senderName(), request.content());
+		broadcastResponse(response);
+	}
+	private void handleSystemMessageRequest(SystemMessageRequest request) {
+		var response = new SystemMessageResponse(request.content());
 		broadcastResponse(response);
 	}
 
@@ -37,6 +52,7 @@ public class ClientRequestHandler implements RequestWriter {
 	@Override
 	public void writeRequest(SerializableRequest request) {
 		if (request instanceof MessageRequest _request) handleMessageRequest(_request);
+		else if (request instanceof SystemMessageRequest _request) handleSystemMessageRequest(_request);
 	}
 
 	private void unicastResponse(SerializableResponse response, ObjectOutput writer) {
@@ -52,4 +68,5 @@ public class ClientRequestHandler implements RequestWriter {
 		for (var writer : writers.values()) unicastResponse(response, writer);
 		responseReader.readResponse(response);
 	}
+
 }

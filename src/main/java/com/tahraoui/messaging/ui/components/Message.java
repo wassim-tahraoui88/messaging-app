@@ -34,7 +34,7 @@ public class Message extends VBox {
 
 		this.contentLabel = new Label();
 		this.contentLabel.setWrapText(true);
-		this.contentLabel.getStyleClass().add("message");
+		this.contentLabel.getStyleClass().add("content");
 
 		var styleClass = this.getStyleClass();
 		styleClass.add("message-container");

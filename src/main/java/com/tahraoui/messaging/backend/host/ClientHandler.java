@@ -3,8 +3,13 @@ package com.tahraoui.messaging.backend.host;
 import com.tahraoui.messaging.backend.data.RequestWriter;
 import com.tahraoui.messaging.backend.data.request.ConnectionRequest;
 import com.tahraoui.messaging.backend.data.request.SerializableRequest;
+import com.tahraoui.messaging.backend.data.request.SystemMessageRequest;
 import com.tahraoui.messaging.backend.data.response.ConnectionResponse;
-import com.tahraoui.messaging.model.exception.*;
+import com.tahraoui.messaging.model.exception.AppException;
+import com.tahraoui.messaging.model.exception.ConnectionFailedException;
+import com.tahraoui.messaging.model.exception.ReadingFailedException;
+import com.tahraoui.messaging.model.exception.WritingFailedException;
+import com.tahraoui.messaging.model.exception.WrongPasswordException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,6 +32,7 @@ public class ClientHandler implements Runnable {
 	private final ObjectInputStream reader;
 	private final ObjectOutputStream writer;
 	private RequestWriter requestWriter;
+	private DisconnectionListener disconnectionListener;
 
 	public ClientHandler(Socket socket, String password, BigInteger p, BigInteger g) throws AppException, IOException {
 		this.socket = socket;
@@ -72,12 +78,18 @@ public class ClientHandler implements Runnable {
 			while (socket.isConnected() && !socket.isClosed()) handleRequest();
 			LOGGER.warn("Socket of Client id {} is closed.", writer.hashCode());
 		}
+		catch (ConnectionFailedException e) {
+			LOGGER.debug("{} [{}] has disconnected.", username, id);
+			requestWriter.writeRequest(new SystemMessageRequest("%s [%d] has disconnected.".formatted(username, id)));
+			disconnectionListener.onDisconnect(id);
+			Thread.currentThread().interrupt();
+		}
 		finally {
 			closeResources();
 		}
 	}
 
-	private void handleRequest() {
+	private void handleRequest() throws ConnectionFailedException {
 		if (requestWriter == null) return;
 		try {
 			var request = reader.readObject();
@@ -86,13 +98,11 @@ public class ClientHandler implements Runnable {
 			if (request instanceof SerializableRequest _request)
 				requestWriter.writeRequest(_request);
 		}
-		catch (IOException | ClassNotFoundException e) {
+		catch (ClassNotFoundException e) {
 			LOGGER.error("Failed to read request: {}.", e.getMessage());
 		}
-		catch (ConnectionFailedException e) {
-			LOGGER.error("Client {} with id [{}] has disconnected.", username, id);
-			closeResources();
-			closeSocket();
+		catch (IOException e) {
+			throw new ConnectionFailedException();
 		}
 	}
 	private void closeSocket() {
@@ -108,13 +118,11 @@ public class ClientHandler implements Runnable {
 			reader.close();
 			writer.close();
 		}
-		catch (IOException e) {
-			LOGGER.fatal("Failed to close resources", e);
-		}
+		catch (IOException _) { }
 	}
 
 	public int getId() { return id; }
 	public ObjectOutput getWriter() { return writer; }
 	public void setRequestWriter(RequestWriter requestWriter) { this.requestWriter = requestWriter; }
-
+	public void setDisconnectionListener(DisconnectionListener disconnectionListener) { this.disconnectionListener = disconnectionListener; }
 }

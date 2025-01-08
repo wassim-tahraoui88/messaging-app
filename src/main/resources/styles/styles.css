@@ -17,6 +17,10 @@
   -fx-background-radius: 10;
   -fx-padding: 5;
 }
+.chat-box .system-message {
+  -fx-font-size: 16;
+  -fx-text-fill: gray;
+}
 .chat-box .message-container .sender {
   -fx-font-size: 12;
   -fx-text-fill: gray;

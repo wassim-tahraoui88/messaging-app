@@ -7,6 +7,7 @@ import com.tahraoui.messaging.backend.data.UserCredentials;
 import com.tahraoui.messaging.backend.data.request.SerializableRequest;
 import com.tahraoui.messaging.backend.data.response.MessageResponse;
 import com.tahraoui.messaging.backend.data.response.SerializableResponse;
+import com.tahraoui.messaging.backend.data.response.SystemMessageResponse;
 import com.tahraoui.messaging.backend.host.Host;
 import com.tahraoui.messaging.model.exception.AppException;
 import com.tahraoui.messaging.ui.listener.ChatBoxListener;
@@ -55,7 +56,7 @@ public class ConnectionService implements ResponseReader {
 
 			isHost = true;
 			this.requestWriter = host;
-			LOGGER.debug("Host started on port {}.", port);
+			LOGGER.info("Host started on port {}.", port);
 		}
 		catch (Exception _) {
 			disconnect();
@@ -103,10 +104,14 @@ public class ConnectionService implements ResponseReader {
 	@Override
 	public void readResponse(SerializableResponse response) {
 		if (response instanceof MessageResponse _response) receiveMessage(_response);
+		else if (response instanceof SystemMessageResponse _response) receiveSystemMessage(_response);
 	}
 
 	private void receiveMessage(MessageResponse message) {
 		if (chatBoxListener != null) Platform.runLater(() -> chatBoxListener.receiveMessage(message));
+	}
+	private void receiveSystemMessage(SystemMessageResponse message) {
+		if (chatBoxListener != null) Platform.runLater(() -> chatBoxListener.receiveSystemMessage(message));
 	}
 
 	//region Setters

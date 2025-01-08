@@ -17,6 +17,10 @@
 	-fx-border-radius: 10;
 	-fx-background-radius: 10;
 	-fx-padding: 5;
+	.system-message {
+		-fx-font-size: 16;
+		-fx-text-fill: gray;
+	}
 	.message-container {
 		.sender {
 			-fx-font-size: 12;

@@ -3,7 +3,9 @@ package com.tahraoui.messaging.ui.controller;
 import com.tahraoui.messaging.backend.ConnectionService;
 import com.tahraoui.messaging.backend.data.request.MessageRequest;
 import com.tahraoui.messaging.backend.data.response.MessageResponse;
+import com.tahraoui.messaging.backend.data.response.SystemMessageResponse;
 import com.tahraoui.messaging.ui.components.Message;
+import com.tahraoui.messaging.ui.components.SystemMessage;
 import com.tahraoui.messaging.ui.listener.ChatBoxListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -41,5 +43,10 @@ public class ChatBoxController implements ChatBoxListener {
 			vbox_messages.getChildren().add(new Message(null, message.content(),false));
 		else
 			vbox_messages.getChildren().add(new Message(message.senderName(), message.content(),true));
+	}
+
+	@Override
+	public void receiveSystemMessage(SystemMessageResponse message) {
+		vbox_messages.getChildren().add(new SystemMessage(message.content()));
 	}
 }
