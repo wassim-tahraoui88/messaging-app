@@ -46,7 +46,7 @@ public class ConnectionService implements ResponseReader {
 
 		try {
 			var host = new Host(port, credentials);
-			host.setListener(this);
+			host.setResponseReader(this);
 
 			this.username = host.getUsername();
 			this.contentListener.switchToChatbox();
@@ -69,7 +69,7 @@ public class ConnectionService implements ResponseReader {
 		}
 		try {
 			var client = new Client(port, credentials);
-			client.setListener(this);
+			client.setResponseReader(this);
 			this.username = client.getUsername();
 			this.contentListener.switchToChatbox();
 

@@ -20,25 +20,23 @@ public class Client implements RequestWriter, ResponseReader {
 	private static final Logger LOGGER = LogManager.getLogger(Client.class);
 
 	private final ClientListener handler;
+	private ResponseReader responseReader;
 
 	public Client(int port, UserCredentials credentials) throws AppException, IOException {
 		var socket = new Socket(InetAddress.getByName(SERVER_NAME), port);
 		this.handler = new ClientListener(socket, credentials);
-		this.handler.setResponseHandler(this);
+		this.handler.setResponseReader(this);
 		var threadName = "Client Thread - [%d]".formatted(this.handler.getId());
 		new Thread(handler, threadName).start();
 	}
 
-	public void setListener(ResponseReader listener) { handler.setListener(listener); }
-	public int getId() { return handler.getId(); }
+	public void setResponseReader(ResponseReader responseReader) { this.responseReader = responseReader; }
 
+	public int getId() { return handler.getId(); }
 	public String getUsername() { return handler.getUsername(); }
 
 	@Override
 	public void writeRequest(SerializableRequest request) { handler.writeRequest(request); }
-
 	@Override
-	public void readResponse(SerializableResponse response) {
-
-	}
+	public void readResponse(SerializableResponse response) { responseReader.readResponse(response); }
 }

@@ -127,14 +127,12 @@ public class ClientListener implements Runnable, RequestWriter, ResponseReader {
 		this.sharedKey = hostPublicKey.modPow(privateKey, p);
 
 	}
-	public void setResponseHandler(ResponseReader responseReader) { this.responseReader = responseReader; }
+	public void setResponseReader(ResponseReader responseReader) { this.responseReader = responseReader; }
 
 	public int getId() { return id; }
 	public BigInteger getPrivateKey() { return privateKey; }
 	public BigInteger getPublicKey() { return publicKey; }
 	public BigInteger getSharedKey() { return sharedKey; }
-
-	public void setListener(ResponseReader listener) { this.responseReader = listener; }
 
 	public String getUsername() { return username; }
 

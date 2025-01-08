@@ -84,7 +84,7 @@ public class Host implements Runnable, RequestWriter, ResponseReader {
 	public BigInteger getPublicKey() { return publicKey; }
 	public BigInteger getSharedKey() { return sharedKey; }
 
-	public void setListener(ResponseReader responseReader) { this.responseReader = responseReader; }
+	public void setResponseReader(ResponseReader responseReader) { this.responseReader = responseReader; }
 
 	@Override
 	public void writeRequest(SerializableRequest request) { requestHandler.writeRequest(request); }
