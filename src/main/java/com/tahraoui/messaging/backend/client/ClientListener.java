@@ -89,7 +89,6 @@ public class ClientListener implements Runnable, RequestWriter, ResponseReader {
 	@Override public void run() {
 		try {
 			while (socket.isConnected() && !socket.isClosed()) handleResponse();
-			LOGGER.warn("Socket is closed.");
 			ConnectionService.getInstance().disconnect();
 		}
 		finally {
