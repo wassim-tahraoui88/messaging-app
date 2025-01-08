@@ -80,8 +80,8 @@ public class ClientHandler implements Runnable {
 		}
 		catch (ConnectionFailedException e) {
 			LOGGER.debug("{} [{}] has disconnected.", username, id);
-			requestWriter.writeRequest(new SystemMessageRequest("%s [%d] has disconnected.".formatted(username, id)));
 			disconnectionListener.onDisconnect(id);
+			requestWriter.writeRequest(new SystemMessageRequest("%s [%d] has disconnected.".formatted(username, id)));
 			Thread.currentThread().interrupt();
 		}
 		finally {
