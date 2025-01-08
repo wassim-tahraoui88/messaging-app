@@ -17,15 +17,23 @@
 	-fx-border-radius: 10;
 	-fx-background-radius: 10;
 	-fx-padding: 5;
-	.message-box {
-		.message {
-			-fx-padding: 5;
-			-fx-border-width: 1;
-			-fx-min-width: 8;
+	.message-container {
+		.sender {
+			-fx-font-size: 12;
+			-fx-text-fill: gray;
+		}
+		.message-box {
+			.message {
+				-fx-padding: 5;
+				-fx-border-width: 1;
+				-fx-min-width: 8;
+			}
 		}
 		&.sent {
-			-fx-alignment: center-right;
-			-fx-text-alignment: right;
+			.message-box {
+				-fx-alignment: center-right;
+				-fx-text-alignment: right;
+			}
 			.message {
 				-fx-text-fill: black;
 				-fx-background-color: #f5f5f5;
@@ -35,8 +43,10 @@
 			}
 		}
 		&.received {
-			-fx-alignment: center-left;
-			-fx-text-alignment: left;
+			.message-box {
+				-fx-alignment: center-left;
+				-fx-text-alignment: left;
+			}
 			.message {
 				-fx-text-fill: white;
 				-fx-background-color: #2196f3;

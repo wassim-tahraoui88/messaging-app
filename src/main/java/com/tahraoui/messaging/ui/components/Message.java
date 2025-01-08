@@ -6,51 +6,82 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
-public class Message extends HBox {
+public class Message extends VBox {
 
 	private static final Boolean DEFAULT_RECEIVED = false;
-	private StringProperty text;
+	private StringProperty senderName;
+	private StringProperty messageContent;
 	private BooleanProperty received;
 
-	private final Label label;
+	private final Label senderLabel, contentLabel;
 
 	public Message(String senderName, String text, boolean received) {
 		this();
-		setText(text);
+
+		if (senderName == null || senderName.isBlank()) getChildren().remove(senderLabel);
+		else setSenderName(senderName);
+
+		setMessageContent(text);
 		setReceived(received);
 	}
+
 	public Message() {
-		this.label = new Label();
-		this.label.setWrapText(true);
-		this.label.getStyleClass().add("message");
+		this.senderLabel = new Label();
+		this.senderLabel.getStyleClass().add("sender");
+
+		this.contentLabel = new Label();
+		this.contentLabel.setWrapText(true);
+		this.contentLabel.getStyleClass().add("message");
+
 		var styleClass = this.getStyleClass();
-		styleClass.add("message-box");
+		styleClass.add("message-container");
 		styleClass.add("sent");
-		getChildren().add(this.label);
+
+		var hBox = new HBox(contentLabel);
+		hBox.getStyleClass().add("message-box");
+		VBox.setVgrow(hBox, Priority.ALWAYS);
+
+		getChildren().add(senderLabel);
+		getChildren().add(hBox);
 		initProperties();
 	}
 	private void initProperties() {
 		receivedProperty().addListener(_ -> updateBackground());
-		textProperty().addListener(_ -> updateText());
+		messageContentProperty().addListener(_ -> updateMessageContent());
+		senderNameProperty().addListener(_ -> updateSenderName());
 	}
 
-	public final StringProperty textProperty() {
-		if (this.text == null) this.text = new SimpleStringProperty("");
-		return this.text;
+	public final StringProperty senderNameProperty() {
+		if (this.senderName == null) this.senderName = new SimpleStringProperty("");
+		return this.senderName;
+	}
+	public final StringProperty messageContentProperty() {
+		if (this.messageContent == null) this.messageContent = new SimpleStringProperty("");
+		return this.messageContent;
 	}
 	public final BooleanProperty receivedProperty() {
 		if (this.received == null) this.received = new SimpleBooleanProperty(this, "received", DEFAULT_RECEIVED);
 		return this.received;
 	}
 
-	public final String getText() { return this.textProperty().getValue(); }
-	public final void setText(String text) { this.textProperty().setValue(text); }
+	public final String getSenderName() { return this.senderNameProperty().getValue(); }
+	public final void setSenderName(String value) { this.senderNameProperty().setValue(value); }
+
+	public final String getMessageContent() { return this.messageContentProperty().getValue(); }
+	public final void setMessageContent(String value) { this.messageContentProperty().setValue(value); }
+
 	public final Boolean getReceived() { return this.receivedProperty().getValue(); }
 	public final void setReceived(Boolean state) { this.receivedProperty().setValue(state); }
 
-	private void updateText() {
-		this.label.setText(getText());
+	private void updateSenderName() {
+		this.senderLabel.setText(getSenderName());
+
+	}
+	private void updateMessageContent() {
+		this.contentLabel.setText(getMessageContent());
 
 	}
 	private void updateBackground() {

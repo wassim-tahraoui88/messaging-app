@@ -17,27 +17,31 @@
   -fx-background-radius: 10;
   -fx-padding: 5;
 }
-.chat-box .message-box .message {
+.chat-box .message-container .sender {
+  -fx-font-size: 12;
+  -fx-text-fill: gray;
+}
+.chat-box .message-container .message-box .message {
   -fx-padding: 5;
   -fx-border-width: 1;
   -fx-min-width: 8;
 }
-.chat-box .message-box.sent {
+.chat-box .message-container.sent .message-box {
   -fx-alignment: center-right;
   -fx-text-alignment: right;
 }
-.chat-box .message-box.sent .message {
+.chat-box .message-container.sent .message {
   -fx-text-fill: black;
   -fx-background-color: #f5f5f5;
   -fx-border-color: #e0e0e0;
   -fx-background-radius: 16 8 8 16;
   -fx-border-radius: 16 8 8 16;
 }
-.chat-box .message-box.received {
+.chat-box .message-container.received .message-box {
   -fx-alignment: center-left;
   -fx-text-alignment: left;
 }
-.chat-box .message-box.received .message {
+.chat-box .message-container.received .message {
   -fx-text-fill: white;
   -fx-background-color: #2196f3;
   -fx-border-color: #1976d2;

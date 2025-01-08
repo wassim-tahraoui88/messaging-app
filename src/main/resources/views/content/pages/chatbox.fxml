@@ -8,7 +8,7 @@
 <?import javafx.scene.control.Button?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.tahraoui.messaging.ui.controller.ChatBoxController">
     <top>
-        <Label>Title Label</Label>
+        <Label fx:id="label_username"/>
     </top>
     <center>
         <ScrollPane fitToWidth="true">
