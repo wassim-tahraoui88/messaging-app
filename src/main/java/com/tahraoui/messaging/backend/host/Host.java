@@ -1,5 +1,6 @@
 package com.tahraoui.messaging.backend.host;
 
+import com.tahraoui.messaging.backend.client.UserCredentials;
 import com.tahraoui.messaging.model.exception.AppException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,6 +16,8 @@ public class Host implements Runnable {
 	private static final int BIT_LENGTH = 2048;
 
 	private final int port;
+	private final int id;
+	private final String username;
 	private final String password;
 	private final ClientRequestHandler requestHandler;
 
@@ -22,7 +25,7 @@ public class Host implements Runnable {
 	private final BigInteger privateKey, publicKey;
 	private BigInteger sharedKey;
 
-	public Host(int port, String password) {
+	public Host(int port, UserCredentials credentials) {
 		var random = new SecureRandom();
 		this.p = BigInteger.probablePrime(BIT_LENGTH, random);
 		this.g = new BigInteger("2");
@@ -30,12 +33,10 @@ public class Host implements Runnable {
 		this.publicKey = g.modPow(privateKey, p);
 
 		this.port = port;
-		this.password = password;
+		this.id = 0;
+		this.username = credentials.username();
+		this.password = credentials.password();
 		this.requestHandler = new ClientRequestHandler();
-	}
-	public void computeSharedKey(BigInteger clientPublicKey) {
-		this.sharedKey = clientPublicKey.modPow(privateKey, p);
-
 	}
 
 	@Override public void run() {
@@ -43,13 +44,13 @@ public class Host implements Runnable {
 			while (!serverSocket.isClosed()) {
 				var socket = serverSocket.accept();
 				try {
-					LOGGER.debug("Server listening on port {}.", socket.getInetAddress());
-					var clientHandler = new ClientHandler(socket, password, p, g);
-					clientHandler.setRequestHandler(requestHandler);
-					var writer = clientHandler.getWriter();
-					var threadName = "ClientHandler Thread - [%d]".formatted(writer.hashCode());
-					requestHandler.add(writer.hashCode(), writer);
-					new Thread(clientHandler, threadName).start();
+					LOGGER.info("Received connection from {}.", socket.getInetAddress());
+					var handler = new ClientHandler(socket, password, p, g);
+					handler.setRequestHandler(requestHandler);
+					var id = handler.getId();
+					var threadName = "ClientHandler Thread - [%d]".formatted(id);
+					requestHandler.add(id, handler.getWriter());
+					new Thread(handler, threadName).start();
 				}
 				catch (AppException e) {
 					LOGGER.error(e.getMessage());
@@ -64,6 +65,13 @@ public class Host implements Runnable {
 		}
 	}
 
+	public void computeSharedKey(BigInteger clientPublicKey) {
+		this.sharedKey = clientPublicKey.modPow(privateKey, p);
+
+	}
+
+	public int getId() { return id; }
+	public String getUsername() { return username; }
 	public BigInteger getP() { return p; }
 	public BigInteger getG() { return g; }
 	public BigInteger getPrivateKey() { return privateKey; }

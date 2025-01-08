@@ -1,3 +1,3 @@
 package com.tahraoui.messaging.backend.data.request;
 
-public record ConnectionRequest(String password) implements SerializableRequest { }
+public record ConnectionRequest(int id, String username, String password) implements SerializableRequest { }

@@ -22,8 +22,9 @@ import java.net.Socket;
 
 public class ClientHandler implements Runnable {
 
-	private static final Logger LOGGER = LogManager.getLogger(ClientHandler.class.getName());
+	private static final Logger LOGGER = LogManager.getLogger(ClientHandler.class);
 
+	private final int id;
 	private final Socket socket;
 	private final ObjectInputStream reader;
 	private final ObjectOutputStream writer;
@@ -34,26 +35,24 @@ public class ClientHandler implements Runnable {
 		this.reader = new ObjectInputStream(socket.getInputStream());
 		this.writer = new ObjectOutputStream(socket.getOutputStream());
 		this.writer.flush();
-		connect(password, new ConnectionResponse(writer.hashCode(), p, g));
+		this.id = connect(password, new ConnectionResponse(p, g,true));
 	}
 
-	private void connect(String password, ConnectionResponse response) throws AppException {
+	private int connect(String password, ConnectionResponse response) throws AppException {
 		var success = false;
 		try {
-			LOGGER.debug("Waiting for connection request...");
+			LOGGER.info("Waiting for connection request...");
 			var request = (ConnectionRequest) this.reader.readObject();
-			LOGGER.debug("Connection request received.");
 			if (request == null || !request.password().equals(password)) {
-				writer.writeObject(new ConnectionResponse(-1, null, null));
+				writer.writeObject(new ConnectionResponse(null,null,false));
 				writer.flush();
 				throw new WrongPasswordException();
 			}
-			LOGGER.debug("Connection request accepted.");
-			LOGGER.debug("Sending connection response...");
 			this.writer.writeObject(response);
 			this.writer.flush();
 			success = true;
-			LOGGER.debug("Connection response sent.");
+			LOGGER.debug("Connection established.");
+			return request.id();
 		}
 		catch (ClassNotFoundException | StreamCorruptedException | OptionalDataException _) {
 			throw new ReadingFailedException();
@@ -72,7 +71,7 @@ public class ClientHandler implements Runnable {
 	@Override public void run() {
 		try {
 			while (socket.isConnected() && !socket.isClosed()) handleRequest();
-			LOGGER.warn("Client with id {} has disconnected.", writer.hashCode());
+			LOGGER.warn("Socket of Client id {} is closed.", writer.hashCode());
 		}
 		finally {
 			closeResources();
@@ -83,12 +82,11 @@ public class ClientHandler implements Runnable {
 		if (requestHandler == null) return;
 		try {
 			var request = reader.readObject();
-			if (!(request instanceof SerializableRequest _request)) return;
-
-			requestHandler.handleRequest(_request);
+			if (request instanceof SerializableRequest _request)
+				requestHandler.handleRequest(_request);
 		}
 		catch (IOException | ClassNotFoundException e) {
-			closeSocket();
+			LOGGER.error("Failed to read request: {}.", e.getMessage());
 		}
 	}
 	private void closeSocket() {
@@ -109,6 +107,8 @@ public class ClientHandler implements Runnable {
 		}
 	}
 
+	public int getId() { return id; }
 	public ObjectOutput getWriter() { return writer; }
 	public void setRequestHandler(RequestHandler requestHandler) { this.requestHandler = requestHandler; }
+
 }

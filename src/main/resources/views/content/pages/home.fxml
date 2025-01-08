@@ -9,6 +9,7 @@
 <?import com.tahraoui.messaging.ui.components.NumberField?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.tahraoui.messaging.ui.controller.HomeController">
     <padding>
@@ -18,6 +19,10 @@
         <HBox alignment="CENTER" spacing="10">
             <VBox alignment="CENTER" spacing="10">
                 <Label styleClass="title">Host a new chat server</Label>
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label>Username:</Label>
+                    <TextField fx:id="textField_hostUsername" promptText="Enter username..."/>
+                </VBox>
                 <VBox spacing="5" alignment="CENTER_LEFT">
                     <Label>Port Number (Between 1 and 65535):</Label>
                     <BorderPane>
@@ -40,6 +45,10 @@
             <Separator orientation="VERTICAL"/>
             <VBox alignment="CENTER" spacing="10">
                 <Label styleClass="title">Join an existing chat server</Label>
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label>Username:</Label>
+                    <TextField fx:id="textField_joinUsername" promptText="Enter username..."/>
+                </VBox>
                 <VBox spacing="5" alignment="CENTER_LEFT">
                     <Label>Port Number (Between 1 and 65535):</Label>
                     <NumberField fx:id="numberField_joinPort" promptText="8080..." prefColumnCount="8"/>

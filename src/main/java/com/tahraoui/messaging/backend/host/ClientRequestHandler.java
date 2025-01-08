@@ -1,7 +1,9 @@
 package com.tahraoui.messaging.backend.host;
 
 import com.tahraoui.messaging.backend.data.RequestHandler;
+import com.tahraoui.messaging.backend.data.request.MessageRequest;
 import com.tahraoui.messaging.backend.data.request.SerializableRequest;
+import com.tahraoui.messaging.backend.data.response.MessageResponse;
 import com.tahraoui.messaging.backend.data.response.SerializableResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,10 +25,9 @@ public class ClientRequestHandler implements RequestHandler {
 
 	public void add(Integer id, ObjectOutput handler) { writers.put(id, handler); }
 
-
 	@Override
 	public void handleRequest(SerializableRequest request) {
-
+		if (request instanceof MessageRequest _request) broadcastResponse(new MessageResponse(_request.senderName(), _request.content()));
 	}
 
 	private void unicastResponse(SerializableResponse response, ObjectOutput writer) {
@@ -39,17 +40,7 @@ public class ClientRequestHandler implements RequestHandler {
 		}
 	}
 
-	private void multicastResponse(SerializableResponse response, Integer... ids) {
-		for (var id : ids) {
-			var writer = writers.get(id);
-			if (writer == null) {
-				LOGGER.error("Client {} not found.", id);
-				continue;
-			}
-			unicastResponse(response, writer);
-		}
-	}
-	private void broadcastResponse(SerializableResponse response) {
+	public void broadcastResponse(SerializableResponse response) {
 		for (var writer : writers.values()) unicastResponse(response, writer);
 	}
 }

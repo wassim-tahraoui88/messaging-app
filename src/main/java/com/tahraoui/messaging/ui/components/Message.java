@@ -15,7 +15,7 @@ public class Message extends HBox {
 
 	private final Label label;
 
-	public Message(String text, boolean received) {
+	public Message(String senderName, String text, boolean received) {
 		this();
 		setText(text);
 		setReceived(received);
