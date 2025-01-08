@@ -93,12 +93,12 @@ public class ConnectionService implements ResponseReader {
 
 	}
 
-	private void disconnect() {
+	public void disconnect() {
 		this.isHost = false;
 		this.isClient = false;
 
 		this.username = null;
-		this.contentListener.switchToHome();
+		Platform.runLater(() -> contentListener.switchToHome());
 	}
 
 	@Override

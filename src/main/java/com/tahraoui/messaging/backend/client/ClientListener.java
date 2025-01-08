@@ -1,5 +1,6 @@
 package com.tahraoui.messaging.backend.client;
 
+import com.tahraoui.messaging.backend.ConnectionService;
 import com.tahraoui.messaging.backend.data.RequestWriter;
 import com.tahraoui.messaging.backend.data.ResponseReader;
 import com.tahraoui.messaging.backend.data.UserCredentials;
@@ -89,6 +90,7 @@ public class ClientListener implements Runnable, RequestWriter, ResponseReader {
 		try {
 			while (socket.isConnected() && !socket.isClosed()) handleResponse();
 			LOGGER.warn("Socket is closed.");
+			ConnectionService.getInstance().disconnect();
 		}
 		finally {
 			closeResources();
