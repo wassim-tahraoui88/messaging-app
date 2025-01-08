@@ -22,13 +22,13 @@
             <BorderPane.margin>
                 <Insets top="5" right="5" bottom="5" left="5"/>
             </BorderPane.margin>
-            <OctIconView glyphName="GEAR" size="28px" stroke="black" fill="transparent" onClick="#onSettingsClicked"/>
-            <MaterialDesignIconView glyphName="WINDOW_MINIMIZE" fx:id="minimize" size="28px" stroke="black" fill="transparent"/>
+            <OctIconView glyphName="GEAR" size="28px" stroke="#888" fill="transparent" onClick="#onSettingsClicked"/>
+            <MaterialDesignIconView glyphName="WINDOW_MINIMIZE" fx:id="minimize" size="28px" stroke="#888" fill="transparent"/>
             <StackPane>
-                <MaterialDesignIconView fx:id="maxIcon" glyphName="WINDOW_MAXIMIZE" size="28px" stroke="black" fill="transparent"/>
-                <MaterialDesignIconView fx:id="restoreIcon" visible="false" glyphName="WINDOW_RESTORE" size="28px" stroke="black" fill="transparent"/>
+                <MaterialDesignIconView fx:id="maxIcon" glyphName="WINDOW_MAXIMIZE" size="28px" stroke="#888" fill="transparent"/>
+                <MaterialDesignIconView fx:id="restoreIcon" glyphName="WINDOW_RESTORE" size="28px" stroke="#888" fill="transparent" visible="false"/>
             </StackPane>
-            <OctIconView glyphName="X" size="28px" stroke="black" fill="transparent" onClick="#onExitClicked"/>
+            <OctIconView glyphName="X" size="28px" stroke="#888" fill="transparent" onClick="#onExitClicked"/>
         </HBox>
     </right>
 </BorderPane>

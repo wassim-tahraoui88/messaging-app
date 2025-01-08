@@ -1,4 +1,4 @@
-package com.tahraoui.messaging.ui.controller;
+package com.tahraoui.messaging.ui.listener;
 
 import com.tahraoui.messaging.backend.data.response.MessageResponse;
 

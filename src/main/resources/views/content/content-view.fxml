@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.BorderPane?>
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.tahraoui.messaging.ui.controller.MainController">
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:id="root" fx:controller="com.tahraoui.messaging.ui.controller.MainController">
     <center>
-        <fx:include source="pages/home.fxml" fx:id="login"/>
+
     </center>
 </BorderPane>

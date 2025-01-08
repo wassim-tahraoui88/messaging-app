@@ -1,4 +1,4 @@
-package com.tahraoui.messaging.backend.client;
+package com.tahraoui.messaging.backend.data;
 
 public record UserCredentials(String username, String password) {
 }

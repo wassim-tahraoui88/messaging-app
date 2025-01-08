@@ -1,8 +1,10 @@
 package com.tahraoui.messaging.ui.controller;
 
 import com.tahraoui.messaging.backend.ConnectionService;
+import com.tahraoui.messaging.backend.data.request.MessageRequest;
 import com.tahraoui.messaging.backend.data.response.MessageResponse;
 import com.tahraoui.messaging.ui.components.Message;
+import com.tahraoui.messaging.ui.listener.ChatBoxListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -25,13 +27,18 @@ public class ChatBoxController implements ChatBoxListener {
 	private void sendMessage() {
 		var message = textField_message.getText();
 		if (message.isEmpty()) return;
-		vbox_messages.getChildren().add(new Message(ConnectionService.getInstance().getUsername(), message,false));
+//		vbox_messages.getChildren().add(new Message(ConnectionService.getInstance().getUsername(), message,false));
+		ConnectionService.getInstance().writeRequest(new MessageRequest(ConnectionService.getInstance().getUsername(), message));
 		textField_message.clear();
 	}
 
 	@Override
 	public void receiveMessage(MessageResponse message) {
-		vbox_messages.getChildren().add(new Message("",message.content(),false));
 
+
+		if (message.senderName().equals(ConnectionService.getInstance().getUsername()))
+			vbox_messages.getChildren().add(new Message(null, message.content(),false));
+		else
+			vbox_messages.getChildren().add(new Message(message.senderName(), message.content(),true));
 	}
 }

@@ -2,7 +2,6 @@ package com.tahraoui.messaging.backend.data;
 
 import com.tahraoui.messaging.backend.data.request.SerializableRequest;
 
-public interface RequestHandler {
-
-	void handleRequest(SerializableRequest request);
+public interface RequestWriter {
+	void writeRequest(SerializableRequest request);
 }

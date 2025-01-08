@@ -1,10 +1,18 @@
 package com.tahraoui.messaging.backend.client;
 
-import com.tahraoui.messaging.backend.data.ResponseHandler;
+import com.tahraoui.messaging.backend.data.RequestWriter;
+import com.tahraoui.messaging.backend.data.ResponseReader;
+import com.tahraoui.messaging.backend.data.UserCredentials;
 import com.tahraoui.messaging.backend.data.request.ConnectionRequest;
+import com.tahraoui.messaging.backend.data.request.SerializableRequest;
 import com.tahraoui.messaging.backend.data.response.ConnectionResponse;
+import com.tahraoui.messaging.backend.data.response.MessageResponse;
 import com.tahraoui.messaging.backend.data.response.SerializableResponse;
-import com.tahraoui.messaging.model.exception.*;
+import com.tahraoui.messaging.model.exception.AppException;
+import com.tahraoui.messaging.model.exception.ConnectionFailedException;
+import com.tahraoui.messaging.model.exception.ReadingFailedException;
+import com.tahraoui.messaging.model.exception.WritingFailedException;
+import com.tahraoui.messaging.model.exception.WrongPasswordException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,7 +25,7 @@ import java.math.BigInteger;
 import java.net.Socket;
 import java.security.SecureRandom;
 
-public class ClientListener implements Runnable {
+public class ClientListener implements Runnable, RequestWriter, ResponseReader {
 
 	private static final Logger LOGGER = LogManager.getLogger(ClientListener.class);
 
@@ -28,7 +36,7 @@ public class ClientListener implements Runnable {
 	private final Socket socket;
 	private final ObjectInputStream reader;
 	private final ObjectOutputStream writer;
-	private ResponseHandler responseHandler;
+	private ResponseReader responseReader;
 
 	public ClientListener(Socket socket, UserCredentials credentials) throws AppException, IOException {
 		this.socket = socket;
@@ -49,7 +57,6 @@ public class ClientListener implements Runnable {
 	public ConnectionResponse connect(UserCredentials credentials) throws AppException {
 		var success = false;
 		try {
-			LOGGER.info("Requesting connection...");
 			this.writer.writeObject(new ConnectionRequest(this.id, credentials.username(), credentials.password()));
 			this.writer.flush();
 
@@ -57,6 +64,8 @@ public class ClientListener implements Runnable {
 
 			if (response == null) throw new ConnectionFailedException();
 			else if (!response.success()) throw new WrongPasswordException();
+
+			success = true;
 
 			LOGGER.info("Connection established.");
 			return response;
@@ -71,6 +80,7 @@ public class ClientListener implements Runnable {
 			if (!success) {
 				closeResources();
 				closeSocket();
+				throw new ConnectionFailedException();
 			}
 		}
 	}
@@ -86,12 +96,10 @@ public class ClientListener implements Runnable {
 	}
 
 	private void handleResponse() {
-		LOGGER.debug("Handling response reading...");
 		try {
-			LOGGER.debug("Reading response object...");
 			var response = reader.readObject();
 			if (response instanceof SerializableResponse _response)
-				responseHandler.handleResponse(_response);
+				responseReader.readResponse(_response);
 		}
 		catch (IOException | ClassNotFoundException e) {
 			closeSocket();
@@ -119,14 +127,29 @@ public class ClientListener implements Runnable {
 		this.sharedKey = hostPublicKey.modPow(privateKey, p);
 
 	}
-	public void setResponseHandler(ResponseHandler responseHandler) { this.responseHandler = responseHandler; }
+	public void setResponseHandler(ResponseReader responseReader) { this.responseReader = responseReader; }
 
 	public int getId() { return id; }
 	public BigInteger getPrivateKey() { return privateKey; }
 	public BigInteger getPublicKey() { return publicKey; }
 	public BigInteger getSharedKey() { return sharedKey; }
 
-	public void setListener(ResponseReceiver listener) { this.responseHandler.setListener(listener); }
+	public void setListener(ResponseReader listener) { this.responseReader = listener; }
 
 	public String getUsername() { return username; }
+
+	@Override
+	public void writeRequest(SerializableRequest request) {
+		try {
+			writer.writeObject(request);
+			writer.flush();
+		}
+		catch (IOException e) {
+			LOGGER.error("Failed write request: {}", e.getMessage());
+		}
+	}
+	@Override
+	public void readResponse(SerializableResponse response) {
+		if (response instanceof MessageResponse _response) responseReader.readResponse(_response);
+	}
 }

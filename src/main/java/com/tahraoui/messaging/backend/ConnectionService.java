@@ -1,19 +1,23 @@
 package com.tahraoui.messaging.backend;
 
 import com.tahraoui.messaging.backend.client.Client;
-import com.tahraoui.messaging.backend.client.UserCredentials;
-import com.tahraoui.messaging.backend.client.ResponseReceiver;
+import com.tahraoui.messaging.backend.data.RequestWriter;
+import com.tahraoui.messaging.backend.data.ResponseReader;
+import com.tahraoui.messaging.backend.data.UserCredentials;
+import com.tahraoui.messaging.backend.data.request.SerializableRequest;
 import com.tahraoui.messaging.backend.data.response.MessageResponse;
+import com.tahraoui.messaging.backend.data.response.SerializableResponse;
 import com.tahraoui.messaging.backend.host.Host;
 import com.tahraoui.messaging.model.exception.AppException;
-import com.tahraoui.messaging.ui.controller.ChatBoxListener;
+import com.tahraoui.messaging.ui.listener.ChatBoxListener;
+import com.tahraoui.messaging.ui.listener.ContentListener;
+import javafx.application.Platform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
-// Singleton pattern
-public class ConnectionService implements ResponseReceiver {
+public class ConnectionService implements ResponseReader {
 	private static final Logger LOGGER = LogManager.getLogger(ConnectionService.class);
 
 	private static ConnectionService instance;
@@ -22,28 +26,44 @@ public class ConnectionService implements ResponseReceiver {
 		return instance;
 	}
 
-	private boolean hostState, clientState;
-	private ChatBoxListener chatBoxListener;
 	private String username;
+	private boolean isHost, isClient;
+	private RequestWriter requestWriter;
+	private ChatBoxListener chatBoxListener;
+	private ContentListener contentListener;
 
 	private ConnectionService() {}
 
 	public String getUsername() { return username; }
 
+	public boolean isConnected() { return isHost || isClient; }
+
 	public void host(int port, UserCredentials credentials) {
-		if (hostState) {
+		if (isConnected()) {
 			LOGGER.warn("Host already started.");
 			return;
 		}
 
-		var host = new Host(port, credentials);
-//		host.setListener(this);
-		new Thread(host,"Thread - Host").start();
-		hostState = true;
-		LOGGER.debug("Host started on port {}.", port);
+		try {
+			var host = new Host(port, credentials);
+			host.setListener(this);
+
+			this.username = host.getUsername();
+			this.contentListener.switchToChatbox();
+
+			new Thread(host,"Thread - Host").start();
+
+			isHost = true;
+			this.requestWriter = host;
+			LOGGER.debug("Host started on port {}.", port);
+		}
+		catch (Exception _) {
+			disconnect();
+			LOGGER.fatal("An error has occurred while starting the host.");
+		}
 	}
 	public void join(int port, UserCredentials credentials) {
-		if (clientState) {
+		if (isConnected()) {
 			LOGGER.warn("Client already connected.");
 			return;
 		}
@@ -51,23 +71,46 @@ public class ConnectionService implements ResponseReceiver {
 			var client = new Client(port, credentials);
 			client.setListener(this);
 			this.username = client.getUsername();
-			clientState = true;
+			this.contentListener.switchToChatbox();
+
+			isClient = true;
+			this.requestWriter = client;
 			LOGGER.debug("Connected to server on port {} with id {}.", port, client.getId());
 		}
 		catch (AppException e) {
+			disconnect();
 			LOGGER.error(e.getMessage());
 		}
 		catch (IOException _) {
+			disconnect();
 			LOGGER.fatal("An error has occurred while connecting.");
 		}
 	}
 
+	public void writeRequest(SerializableRequest request) {
+		requestWriter.writeRequest(request);
+
+	}
+
+	private void disconnect() {
+		this.isHost = false;
+		this.isClient = false;
+
+		this.username = null;
+		this.contentListener.switchToHome();
+	}
+
 	@Override
-	public void receiveMessage(MessageResponse response) {
-		if (chatBoxListener != null) chatBoxListener.receiveMessage(response);
+	public void readResponse(SerializableResponse response) {
+		if (response instanceof MessageResponse _response) receiveMessage(_response);
+	}
+
+	private void receiveMessage(MessageResponse message) {
+		if (chatBoxListener != null) Platform.runLater(() -> chatBoxListener.receiveMessage(message));
 	}
 
 	//region Setters
+	public void setContentListener(ContentListener listener) { contentListener = listener; }
 	public void setChatBoxControllerListener(ChatBoxListener listener) { chatBoxListener = listener; }
 
 

@@ -1,6 +1,10 @@
 package com.tahraoui.messaging.backend.host;
 
-import com.tahraoui.messaging.backend.client.UserCredentials;
+import com.tahraoui.messaging.backend.data.RequestWriter;
+import com.tahraoui.messaging.backend.data.ResponseReader;
+import com.tahraoui.messaging.backend.data.UserCredentials;
+import com.tahraoui.messaging.backend.data.request.SerializableRequest;
+import com.tahraoui.messaging.backend.data.response.SerializableResponse;
 import com.tahraoui.messaging.model.exception.AppException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,7 +14,7 @@ import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.security.SecureRandom;
 
-public class Host implements Runnable {
+public class Host implements Runnable, RequestWriter, ResponseReader {
 
 	private static final Logger LOGGER = LogManager.getLogger(Host.class);
 	private static final int BIT_LENGTH = 2048;
@@ -20,6 +24,7 @@ public class Host implements Runnable {
 	private final String username;
 	private final String password;
 	private final ClientRequestHandler requestHandler;
+	private ResponseReader responseReader;
 
 	private final BigInteger p, g;
 	private final BigInteger privateKey, publicKey;
@@ -37,6 +42,7 @@ public class Host implements Runnable {
 		this.username = credentials.username();
 		this.password = credentials.password();
 		this.requestHandler = new ClientRequestHandler();
+		this.requestHandler.setResponseReader(this);
 	}
 
 	@Override public void run() {
@@ -46,7 +52,7 @@ public class Host implements Runnable {
 				try {
 					LOGGER.info("Received connection from {}.", socket.getInetAddress());
 					var handler = new ClientHandler(socket, password, p, g);
-					handler.setRequestHandler(requestHandler);
+					handler.setRequestWriter(requestHandler);
 					var id = handler.getId();
 					var threadName = "ClientHandler Thread - [%d]".formatted(id);
 					requestHandler.add(id, handler.getWriter());
@@ -77,4 +83,11 @@ public class Host implements Runnable {
 	public BigInteger getPrivateKey() { return privateKey; }
 	public BigInteger getPublicKey() { return publicKey; }
 	public BigInteger getSharedKey() { return sharedKey; }
+
+	public void setListener(ResponseReader responseReader) { this.responseReader = responseReader; }
+
+	@Override
+	public void writeRequest(SerializableRequest request) { requestHandler.writeRequest(request); }
+	@Override
+	public void readResponse(SerializableResponse response) { this.responseReader.readResponse(response); }
 }
