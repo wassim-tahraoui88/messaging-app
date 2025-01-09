@@ -42,7 +42,7 @@
   -fx-text-fill: gray;
 }
 .chat-box .message-container .message-box .message {
-  -fx-padding: 10;
+  -fx-padding: 5;
   -fx-border-width: 1;
   -fx-min-width: 12;
   -fx-font-size: 20;
@@ -53,7 +53,7 @@
 }
 .chat-box .message-container.sent .message {
   -fx-text-fill: black;
-  -fx-background-color: #f5f5f5;
+  -fx-background-color: #f0f0f0;
   -fx-border-color: #e0e0e0;
   -fx-background-radius: 16 8 8 16;
   -fx-border-radius: 16 8 8 16;
