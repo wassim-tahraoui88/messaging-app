@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 public class ConnectionService implements RequestWriter, ResponseReader {
+
 	private static final Logger LOGGER = LogManager.getLogger(ConnectionService.class);
 
 	private static ConnectionService instance;

@@ -14,13 +14,13 @@ public class SidebarController implements NavigationListener, ConnectionListener
 
 	@FXML private void initialize() {
 		ConnectionService.getInstance().addNavigationListener(this);
+
 	}
 
 	@Override
 	public void receiveConnection(Connection connection) {
 		vbox_connectedUsers.getChildren().add(new ConnectedProfile(connection));
 	}
-
 	@Override
 	public void removeConnection(int id) {
 		var children = vbox_connectedUsers.getChildren();
@@ -29,7 +29,6 @@ public class SidebarController implements NavigationListener, ConnectionListener
 
 	@Override
 	public void switchToHome() { root.setVisible(false); }
-
 	@Override
 	public void switchToChatbox() {
 		root.setVisible(true);
