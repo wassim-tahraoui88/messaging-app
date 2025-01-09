@@ -30,7 +30,7 @@ public class SidebarController implements NavigationListener, ConnectionListener
 
 	@Override
 	public void receiveConnection(Connection connection) {
-		var connectedProfile = new ConnectedProfile(connection, connection.id() == 0);
+		var connectedProfile = new ConnectedProfile(connection, connection.id() != 0);
 		if (connection.id() != 0) connectedProfile.setKickHandler(() -> ConnectionService.getInstance().writeRequest(new KickRequest(connection.id(), connection.username())));
 
 		vbox_connectedUsers.getChildren().add(connectedProfile);
