@@ -18,8 +18,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 
-public class ConnectionService implements ResponseReader {
+public class ConnectionService implements RequestWriter, ResponseReader {
 	private static final Logger LOGGER = LogManager.getLogger(ConnectionService.class);
 
 	private static ConnectionService instance;
@@ -88,12 +89,13 @@ public class ConnectionService implements ResponseReader {
 			disconnect();
 			LOGGER.error(e.getMessage());
 		}
-		catch (IOException _) {
+		catch (IOException | GeneralSecurityException _) {
 			disconnect();
 			LOGGER.fatal("An error has occurred while connecting.");
 		}
 	}
 
+	@Override
 	public void writeRequest(SerializableRequest request) {
 		requestWriter.writeRequest(request);
 
@@ -116,6 +118,11 @@ public class ConnectionService implements ResponseReader {
 		else if (response instanceof SystemMessageResponse _response) receiveSystemMessage(_response);
 	}
 
+	@Override
+	public byte[] encryptMessage(String message) { return requestWriter.encryptMessage(message); }
+	@Override
+	public String decryptMessage(byte[] data) { return requestWriter.decryptMessage(data); }
+
 	private void receiveMessage(MessageResponse message) {
 		if (chatBoxListener != null) Platform.runLater(() -> chatBoxListener.receiveMessage(message));
 	}
@@ -126,7 +133,5 @@ public class ConnectionService implements ResponseReader {
 	//region Setters
 	public void setContentListener(ContentListener listener) { contentListener = listener; }
 	public void setChatBoxControllerListener(ChatBoxListener listener) { chatBoxListener = listener; }
-
-
 	//endregion
 }

@@ -14,17 +14,20 @@ import com.tahraoui.messaging.model.exception.ConnectionFailedException;
 import com.tahraoui.messaging.model.exception.ReadingFailedException;
 import com.tahraoui.messaging.model.exception.WritingFailedException;
 import com.tahraoui.messaging.model.exception.WrongPasswordException;
+import com.tahraoui.messaging.util.EncryptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 import java.io.StreamCorruptedException;
-import java.math.BigInteger;
 import java.net.Socket;
-import java.security.SecureRandom;
+import java.security.GeneralSecurityException;
+import java.security.KeyPair;
 
 public class ClientListener implements Runnable, RequestWriter, ResponseReader {
 
@@ -32,33 +35,35 @@ public class ClientListener implements Runnable, RequestWriter, ResponseReader {
 
 	private final int id;
 	private final String username;
-	private final BigInteger privateKey, publicKey;
-	private BigInteger sharedKey;
+
+	private final KeyPair rsaKeyPair;
+	private final SecretKey aesKey;
+	private final IvParameterSpec iv;
+
 	private final Socket socket;
 	private final ObjectInputStream reader;
 	private final ObjectOutputStream writer;
 	private ResponseReader responseReader;
 
-	public ClientListener(Socket socket, UserCredentials credentials) throws AppException, IOException {
+	public ClientListener(Socket socket, UserCredentials credentials) throws AppException, IOException, GeneralSecurityException {
+		this.rsaKeyPair = EncryptionUtils.generateKeyPair();
+
 		this.socket = socket;
 		this.writer = new ObjectOutputStream(socket.getOutputStream());
 		this.reader = new ObjectInputStream(socket.getInputStream());
 		this.writer.flush();
+
 		this.id = writer.hashCode();
-
 		var response = connect(credentials);
-
 		this.username = credentials.username();
-
-		var random = new SecureRandom();
-		this.privateKey = new BigInteger(response.p().bitLength(), random);
-		this.publicKey = response.g().modPow(privateKey, response.p());
+		this.aesKey = EncryptionUtils.decryptRSA(response.secret(), rsaKeyPair.getPrivate());
+		this.iv = new IvParameterSpec(response.iv());
 	}
 
 	public ConnectionEstablishmentResponse connect(UserCredentials credentials) throws AppException {
 		var success = false;
 		try {
-			this.writer.writeObject(new ConnectionEstablishmentRequest(this.id, credentials.username(), credentials.password()));
+			this.writer.writeObject(new ConnectionEstablishmentRequest(this.id, credentials.username(), credentials.password(), rsaKeyPair.getPublic()));
 			this.writer.flush();
 
 			var response = (ConnectionEstablishmentResponse) this.reader.readObject();
@@ -67,7 +72,6 @@ public class ClientListener implements Runnable, RequestWriter, ResponseReader {
 			else if (!response.success()) throw new WrongPasswordException();
 
 			success = true;
-
 			LOGGER.info("Connection established.");
 			return response;
 		}
@@ -124,16 +128,9 @@ public class ClientListener implements Runnable, RequestWriter, ResponseReader {
 		}
 	}
 
-	public void computeSharedKey(BigInteger hostPublicKey, BigInteger p) {
-		this.sharedKey = hostPublicKey.modPow(privateKey, p);
-
-	}
 	public void setResponseReader(ResponseReader responseReader) { this.responseReader = responseReader; }
 
 	public int getId() { return id; }
-	public BigInteger getPrivateKey() { return privateKey; }
-	public BigInteger getPublicKey() { return publicKey; }
-	public BigInteger getSharedKey() { return sharedKey; }
 
 	public String getUsername() { return username; }
 
@@ -148,7 +145,24 @@ public class ClientListener implements Runnable, RequestWriter, ResponseReader {
 		}
 	}
 	@Override
-	public void readResponse(SerializableResponse response) {
-		if (response instanceof MessageResponse _response) responseReader.readResponse(_response);
+	public void readResponse(SerializableResponse response) { responseReader.readResponse(response); }
+
+	@Override
+	public byte[] encryptMessage(String message) {
+		try {
+			return EncryptionUtils.encrypt(message, aesKey, iv);
+		}
+		catch (GeneralSecurityException e) {
+			return null;
+		}
+	}
+	@Override
+	public String decryptMessage(byte[] data) {
+		try {
+			return EncryptionUtils.decrypt(data, aesKey, iv);
+		}
+		catch (GeneralSecurityException e) {
+			return null;
+		}
 	}
 }

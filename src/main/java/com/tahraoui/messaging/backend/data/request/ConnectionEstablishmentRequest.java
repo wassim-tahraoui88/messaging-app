@@ -1,3 +1,5 @@
 package com.tahraoui.messaging.backend.data.request;
 
-public record ConnectionEstablishmentRequest(int id, String username, String password) implements SerializableRequest { }
+import java.security.PublicKey;
+
+public record ConnectionEstablishmentRequest(int id, String username, String password, PublicKey key) implements SerializableRequest { }

@@ -10,9 +10,12 @@ import com.tahraoui.messaging.model.exception.ConnectionFailedException;
 import com.tahraoui.messaging.model.exception.ReadingFailedException;
 import com.tahraoui.messaging.model.exception.WritingFailedException;
 import com.tahraoui.messaging.model.exception.WrongPasswordException;
+import com.tahraoui.messaging.util.EncryptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
@@ -21,10 +24,16 @@ import java.io.OptionalDataException;
 import java.io.StreamCorruptedException;
 import java.math.BigInteger;
 import java.net.Socket;
+import java.security.KeyPair;
+import java.security.PublicKey;
 
 public class ClientHandler implements Runnable {
 
 	private static final Logger LOGGER = LogManager.getLogger(ClientHandler.class);
+
+	private final SecretKey aesKey;
+	private final KeyPair rsaKeyPair;
+	private final IvParameterSpec iv;
 
 	private final int id;
 	private boolean isKicked;
@@ -35,7 +44,11 @@ public class ClientHandler implements Runnable {
 	private final RequestWriter requestWriter;
 	private DisconnectionListener disconnectionListener;
 
-	public ClientHandler(Socket socket, String password, RequestWriter requestWriter, BigInteger p, BigInteger g) throws AppException, IOException {
+	public ClientHandler(Socket socket, String password, RequestWriter requestWriter, KeyPair rsaKeyPair, SecretKey aesKey, IvParameterSpec iv) throws AppException, IOException {
+		this.aesKey = aesKey;
+		this.rsaKeyPair = rsaKeyPair;
+		this.iv = iv;
+
 		this.socket = socket;
 		this.reader = new ObjectInputStream(socket.getInputStream());
 		this.writer = new ObjectOutputStream(socket.getOutputStream());
@@ -43,23 +56,29 @@ public class ClientHandler implements Runnable {
 
 		this.requestWriter = requestWriter;
 
-		var request = connect(password, new ConnectionEstablishmentResponse(p, g,true));
+		var request = connect(password);
 		this.id = request.id();
 		this.username = request.username();
 		this.requestWriter.writeRequest(new SystemMessageRequest("%s [%d] has joined the chat.".formatted(username, id)));
 	}
 
-	private ConnectionEstablishmentRequest connect(String password, ConnectionEstablishmentResponse response) throws AppException {
+	private ConnectionEstablishmentRequest connect(String password) throws AppException {
 		var success = false;
 		try {
 			var request = (ConnectionEstablishmentRequest) this.reader.readObject();
+
 			if (request == null || !request.password().equals(password)) {
-				writer.writeObject(new ConnectionEstablishmentResponse(null,null,false));
+				writer.writeObject(new ConnectionEstablishmentResponse(null,null, null,false));
 				writer.flush();
 				throw new WrongPasswordException();
 			}
+
+			var encryptedKey = EncryptionUtils.encryptRSA(aesKey.getEncoded(), request.key());
+
+			var response = new ConnectionEstablishmentResponse(rsaKeyPair.getPublic(), encryptedKey, iv.getIV(), true);
 			this.writer.writeObject(response);
 			this.writer.flush();
+
 			success = true;
 			return request;
 		}
@@ -68,6 +87,9 @@ public class ClientHandler implements Runnable {
 		}
 		catch (IOException _) {
 			throw new WritingFailedException();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 		finally {
 			if (!success) {

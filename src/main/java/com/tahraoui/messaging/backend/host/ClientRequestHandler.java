@@ -10,11 +10,15 @@ import com.tahraoui.messaging.backend.data.response.KickResponse;
 import com.tahraoui.messaging.backend.data.response.MessageResponse;
 import com.tahraoui.messaging.backend.data.response.SerializableResponse;
 import com.tahraoui.messaging.backend.data.response.SystemMessageResponse;
+import com.tahraoui.messaging.util.EncryptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import java.io.IOException;
 import java.io.ObjectOutput;
+import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,9 +28,12 @@ public class ClientRequestHandler implements RequestWriter {
 	private final Map<Integer, ClientHandler> handlers;
 	private ResponseReader responseReader;
 
-	public ClientRequestHandler() {
+	private final SecretKey aesKey;
+	private final IvParameterSpec iv;
+	public ClientRequestHandler(SecretKey aesKey, IvParameterSpec iv) {
 		this.handlers = new HashMap<>(10);
-
+		this.aesKey = aesKey;
+		this.iv = iv;
 	}
 
 	public void add(int id, ClientHandler handler) { handlers.put(id, handler); }
@@ -39,6 +46,23 @@ public class ClientRequestHandler implements RequestWriter {
 		if (request instanceof SystemMessageRequest _request) handleSystemMessageRequest(_request);
 		else if (request instanceof KickRequest _request) handleKickRequest(_request);
 		else if (request instanceof MessageRequest _request) handleMessageRequest(_request);
+	}
+
+	@Override public byte[] encryptMessage(String message) {
+		try {
+			return EncryptionUtils.encrypt(message, aesKey, iv);
+		}
+		catch (GeneralSecurityException e) {
+			return null;
+		}
+	}
+	@Override public String decryptMessage(byte[] data) {
+		try {
+			return EncryptionUtils.decrypt(data, aesKey, iv);
+		}
+		catch (GeneralSecurityException e) {
+			return null;
+		}
 	}
 
 	private void unicastResponse(SerializableResponse response, ObjectOutput writer) {
@@ -68,7 +92,7 @@ public class ClientRequestHandler implements RequestWriter {
 		broadcastResponse(new SystemMessageResponse("%s [%d] has been kicked from the chat.".formatted(request.username(), request.userId())));
 	}
 	private void handleMessageRequest(MessageRequest request) {
-		var response = new MessageResponse(request.senderId(), request.senderName(), request.content());
+		var response = new MessageResponse(request.senderId(), request.senderName(), decryptMessage(request.data()));
 		broadcastResponse(response);
 	}
 

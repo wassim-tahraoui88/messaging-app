@@ -3,37 +3,60 @@ package com.tahraoui.messaging.util;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.util.Base64;
-import java.util.Random;
+import java.security.GeneralSecurityException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
 
 public class EncryptionUtils {
 
-	private static final String ALGORITHM = "AES";
+	private static final String KEY_ALGORITHM = "AES";
+	private static final String ENCRYPTION_ALGORITHM = "AES/CBC/PKCS5Padding";
+	private static final String KEY_SHARING_ALGORITHM = "RSA";
 
-	public static String generateCode() {
-		return new Random().ints(65,90).limit(10)
-				.collect(StringBuilder::new,StringBuilder::appendCodePoint,StringBuilder::append).toString();
-	}
+	private static final int BIT_LENGTH = 256;
+	private static final int IV_BYTES = 16;
 
-	public static SecretKey generateSecretKey() throws Exception {
-		var keyGenerator = KeyGenerator.getInstance(ALGORITHM);
+	public static SecretKey generateKey() throws GeneralSecurityException {
+		var keyGenerator = KeyGenerator.getInstance(KEY_ALGORITHM);
+		keyGenerator.init(BIT_LENGTH);
 		return keyGenerator.generateKey();
 	}
-	public static SecretKey getSecretKeyFromBytes(byte[] bytes) { return new SecretKeySpec(bytes, ALGORITHM); }
-
-	public static String encrypt(String text, SecretKey secretKey) throws Exception {
-		var cipher = Cipher.getInstance(ALGORITHM);
-		cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-		byte[] encryptedBytes = cipher.doFinal(text.getBytes());
-		return Base64.getEncoder().encodeToString(encryptedBytes);
+	public static byte[] encrypt(String message, SecretKey key, IvParameterSpec iv) throws GeneralSecurityException {
+		var cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
+		cipher.init(Cipher.ENCRYPT_MODE, key, iv);
+		return cipher.doFinal(message.getBytes());
 	}
-	public static String decrypt(String encryptedText, SecretKey secretKey) throws Exception {
-		Cipher cipher = Cipher.getInstance(ALGORITHM);
-		cipher.init(Cipher.DECRYPT_MODE, secretKey);
-		byte[] decodedBytes = Base64.getDecoder().decode(encryptedText);
-		return new String(cipher.doFinal(decodedBytes));
+	public static String decrypt(byte[] encrypted, SecretKey key, IvParameterSpec iv) throws GeneralSecurityException {
+		var cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
+		cipher.init(Cipher.DECRYPT_MODE, key, iv);
+		return new String(cipher.doFinal(encrypted));
 	}
 
+	public static KeyPair generateKeyPair() throws GeneralSecurityException {
+		var keyPairGenerator = KeyPairGenerator.getInstance(KEY_SHARING_ALGORITHM);
+		keyPairGenerator.initialize(BIT_LENGTH);
+		return keyPairGenerator.generateKeyPair();
+	}
+	public static byte[] encryptRSA(byte[] message, PublicKey key) throws GeneralSecurityException {
+		var cipher = Cipher.getInstance(KEY_SHARING_ALGORITHM);
+		cipher.init(Cipher.ENCRYPT_MODE, key);
+		return cipher.doFinal(message);
+	}
+	public static SecretKey decryptRSA(byte[] encrypted, PrivateKey key) throws GeneralSecurityException {
+		var cipher = Cipher.getInstance(KEY_SHARING_ALGORITHM);
+		cipher.init(Cipher.DECRYPT_MODE, key);
+		var decryptedAESKey = cipher.doFinal(encrypted);
+		return new SecretKeySpec(decryptedAESKey, 0, decryptedAESKey.length, KEY_ALGORITHM);
+	}
 
+	public static IvParameterSpec generateIV() {
+		var iv = new byte[IV_BYTES];
+		new SecureRandom().nextBytes(iv);
+		return new IvParameterSpec(iv);
+	}
 }

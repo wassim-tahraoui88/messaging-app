@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.security.GeneralSecurityException;
 
 import static com.tahraoui.messaging.util.NetworkUtils.SERVER_NAME;
 
@@ -23,7 +24,7 @@ public class Client implements RequestWriter, ResponseReader {
 	private final ClientListener handler;
 	private ResponseReader responseReader;
 
-	public Client(int port, UserCredentials credentials) throws AppException, IOException {
+	public Client(int port, UserCredentials credentials) throws AppException, IOException, GeneralSecurityException {
 		var socket = new Socket(InetAddress.getByName(SERVER_NAME), port);
 		this.handler = new ClientListener(socket, credentials);
 		this.handler.setResponseReader(this);
@@ -43,4 +44,9 @@ public class Client implements RequestWriter, ResponseReader {
 		if (response instanceof KickResponse) handler.closeSocket();
 		else responseReader.readResponse(response);
 	}
+
+	@Override
+	public byte[] encryptMessage(String message) { return handler.encryptMessage(message); }
+	@Override
+	public String decryptMessage(byte[] data) { return handler.decryptMessage(data); }
 }

@@ -35,7 +35,7 @@ public class ChatBoxController implements ChatBoxListener {
 		var message = textField_message.getText();
 		if (message.isEmpty()) return;
 		var connectionInstance = ConnectionService.getInstance();
-		connectionInstance.writeRequest(new MessageRequest(connectionInstance.getId(), connectionInstance.getUsername(), message));
+		connectionInstance.writeRequest(new MessageRequest(connectionInstance.getId(), connectionInstance.getUsername(), connectionInstance.encryptMessage(message)));
 		textField_message.clear();
 	}
 
