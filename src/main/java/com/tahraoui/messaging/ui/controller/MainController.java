@@ -1,7 +1,7 @@
 package com.tahraoui.messaging.ui.controller;
 
 import com.tahraoui.messaging.backend.ConnectionService;
-import com.tahraoui.messaging.ui.listener.ContentListener;
+import com.tahraoui.messaging.ui.listener.NavigationListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.BorderPane;
@@ -9,7 +9,7 @@ import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 
-public class MainController implements ContentListener {
+public class MainController implements NavigationListener {
 
 	private enum Page { HOME, CHATBOX }
 
@@ -17,7 +17,7 @@ public class MainController implements ContentListener {
 
 	@FXML private void initialize() {
 		switchToHome();
-		ConnectionService.getInstance().setContentListener(this);
+		ConnectionService.getInstance().addNavigationListener(this);
 	}
 
 	@FXML public void switchToHome() { switchPage(Page.HOME); }

@@ -2,7 +2,7 @@ package com.tahraoui.messaging.ui.controller;
 
 import com.tahraoui.gui.popup.ModalFactory;
 import com.tahraoui.messaging.backend.ConnectionService;
-import com.tahraoui.messaging.backend.data.pojo.UserCredentials;
+import com.tahraoui.messaging.model.UserCredentials;
 import com.tahraoui.messaging.ui.components.NumberField;
 import com.tahraoui.messaging.util.NetworkUtils;
 import javafx.fxml.FXML;

@@ -3,7 +3,7 @@ package com.tahraoui.messaging.backend;
 import com.tahraoui.messaging.backend.client.Client;
 import com.tahraoui.messaging.backend.data.RequestWriter;
 import com.tahraoui.messaging.backend.data.ResponseReader;
-import com.tahraoui.messaging.backend.data.pojo.UserCredentials;
+import com.tahraoui.messaging.model.UserCredentials;
 import com.tahraoui.messaging.backend.data.request.SerializableRequest;
 import com.tahraoui.messaging.backend.data.response.KickResponse;
 import com.tahraoui.messaging.backend.data.response.MessageResponse;
@@ -12,7 +12,7 @@ import com.tahraoui.messaging.backend.data.response.SystemMessageResponse;
 import com.tahraoui.messaging.backend.host.Host;
 import com.tahraoui.messaging.model.exception.AppException;
 import com.tahraoui.messaging.ui.listener.ChatBoxListener;
-import com.tahraoui.messaging.ui.listener.ContentListener;
+import com.tahraoui.messaging.ui.listener.NavigationListener;
 import javafx.application.Platform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,15 +29,19 @@ public class ConnectionService implements RequestWriter, ResponseReader {
 		return instance;
 	}
 
+	private final Navigator navigator;
+
 	private int id;
 	private String username;
 	public boolean isHost;
 	private boolean isClient;
 	private RequestWriter requestWriter;
 	private ChatBoxListener chatBoxListener;
-	private ContentListener contentListener;
 
-	private ConnectionService() {}
+	private ConnectionService() {
+		this.navigator = new Navigator();
+
+	}
 
 	public int getId() { return id; }
 	public String getUsername() { return username; }
@@ -56,7 +60,7 @@ public class ConnectionService implements RequestWriter, ResponseReader {
 
 			this.id = 0;
 			this.username = host.getUsername();
-			this.contentListener.switchToChatbox();
+			this.navigator.switchToChatbox();
 
 			new Thread(host,"Thread - Host").start();
 
@@ -84,7 +88,7 @@ public class ConnectionService implements RequestWriter, ResponseReader {
 			client.setResponseReader(this);
 			this.id = client.getId();
 			this.username = client.getUsername();
-			this.contentListener.switchToChatbox();
+			this.navigator.switchToChatbox();
 
 			isClient = true;
 			this.requestWriter = client;
@@ -113,7 +117,7 @@ public class ConnectionService implements RequestWriter, ResponseReader {
 		this.requestWriter = null;
 
 		this.username = null;
-		Platform.runLater(() -> contentListener.switchToHome());
+		navigator.switchToHome();
 	}
 
 	@Override
@@ -136,7 +140,7 @@ public class ConnectionService implements RequestWriter, ResponseReader {
 	}
 
 	//region Setters
-	public void setContentListener(ContentListener listener) { contentListener = listener; }
-	public void setChatBoxControllerListener(ChatBoxListener listener) { chatBoxListener = listener; }
+	public void addNavigationListener(NavigationListener listener) { this.navigator.add(listener); }
+	public void setChatBoxListener(ChatBoxListener listener) { chatBoxListener = listener; }
 	//endregion
 }

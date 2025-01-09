@@ -2,7 +2,7 @@ package com.tahraoui.messaging.backend.host;
 
 import com.tahraoui.messaging.backend.data.RequestWriter;
 import com.tahraoui.messaging.backend.data.ResponseReader;
-import com.tahraoui.messaging.backend.data.pojo.UserCredentials;
+import com.tahraoui.messaging.model.UserCredentials;
 import com.tahraoui.messaging.backend.data.request.SerializableRequest;
 import com.tahraoui.messaging.backend.data.response.SerializableResponse;
 import com.tahraoui.messaging.model.exception.AppException;

@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.tahraoui.messaging.ui.controller.SideBarController">
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" alignment="TOP_CENTER"
+      fx:id="root" fx:controller="com.tahraoui.messaging.ui.controller.SidebarController" visible="false">
 
-</AnchorPane>
+    <Label text="Connected users"/>
+    <VBox alignment="TOP_CENTER" spacing="25" VBox.vgrow="ALWAYS" fx:id="vbox_connectedUsers">
+
+    </VBox>
+</VBox>

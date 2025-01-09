@@ -1,3 +1,3 @@
-package com.tahraoui.messaging.backend.data.pojo;
+package com.tahraoui.messaging.model;
 
 public record UserCredentials(String username, String password) { }

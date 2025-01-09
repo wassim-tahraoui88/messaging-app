@@ -29,7 +29,7 @@ public class ChatBoxController implements ChatBoxListener {
 		});
 		var connectionInstance = ConnectionService.getInstance();
 		label_username.setText(connectionInstance.getUsername());
-		connectionInstance.setChatBoxControllerListener(this);
+		connectionInstance.setChatBoxListener(this);
 	}
 	private void sendMessage() {
 		var message = textField_message.getText();
