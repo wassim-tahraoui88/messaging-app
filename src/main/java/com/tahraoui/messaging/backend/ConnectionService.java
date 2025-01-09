@@ -44,11 +44,7 @@ public class ConnectionService implements RequestWriter, ResponseReader {
 
 	}
 
-	public int getId() { return id; }
-	public String getUsername() { return username; }
-
-	public boolean isConnected() { return isHost || isClient; }
-
+	//region Host/Client
 	public void host(int port, UserCredentials credentials) {
 		if (isConnected()) {
 			LOGGER.warn("Host already started.");
@@ -58,59 +54,55 @@ public class ConnectionService implements RequestWriter, ResponseReader {
 		try {
 			var host = new Host(port, credentials);
 			host.setResponseReader(this);
-
 			this.id = 0;
 			this.username = host.getUsername();
-			this.navigator.switchToChatbox();
-
-			new Thread(host,"Thread - Host").start();
-
-			isHost = true;
 			this.requestWriter = host;
-			LOGGER.info("Host started on port {}.", port);
+			new Thread(host,"Thread - Host").start();
 		}
 		catch (GeneralSecurityException e) {
 			disconnect();
 			LOGGER.error(e.getMessage());
+			return;
 		}
 		catch (Exception e) {
 			System.out.println(e.getMessage());
 			disconnect();
 			LOGGER.fatal("An error has occurred while starting the host.");
+			return;
 		}
+
+		this.isHost = true;
+		this.navigator.switchToChatbox();
+		LOGGER.info("Host started on port {}.", port);
 	}
 	public void join(int port, UserCredentials credentials) {
 		if (isConnected()) {
 			LOGGER.warn("Client already connected.");
 			return;
 		}
+
 		try {
 			var client = new Client(port, credentials);
 			client.setResponseReader(this);
 			this.id = client.getId();
 			this.username = client.getUsername();
-			this.navigator.switchToChatbox();
-
-			isClient = true;
 			this.requestWriter = client;
-			LOGGER.debug("Connected to server on port {} with id {}.", port, client.getId());
 		}
 		catch (AppException | GeneralSecurityException e) {
 			disconnect();
 			LOGGER.error(e.getMessage());
+			return;
 		}
 		catch (IOException _) {
 			disconnect();
 			LOGGER.fatal("An error has occurred while connecting.");
+			return;
 		}
+
+		this.isClient = true;
+		this.navigator.switchToChatbox();
+		LOGGER.debug("Connected to server on port {} with id {}.", port, id);
 	}
-
-	@Override
-	public void writeRequest(SerializableRequest request) {
-		requestWriter.writeRequest(request);
-
-	}
-
 	public void disconnect() {
 		this.isHost = false;
 		this.isClient = false;
@@ -120,25 +112,37 @@ public class ConnectionService implements RequestWriter, ResponseReader {
 		this.username = null;
 		navigator.switchToHome();
 	}
+	//endregion
 
-	@Override
-	public void readResponse(SerializableResponse response) {
+	//region Overrides
+	@Override public void writeRequest(SerializableRequest request) {
+		requestWriter.writeRequest(request);
+
+	}
+	@Override public void readResponse(SerializableResponse response) {
 		if (response instanceof MessageResponse _response) receiveMessage(_response);
 		else if (response instanceof KickResponse) disconnect();
 		else if (response instanceof SystemMessageResponse _response) receiveSystemMessage(_response);
 	}
 
-	@Override
-	public byte[] encryptMessage(String message) { return requestWriter.encryptMessage(message); }
-	@Override
-	public String decryptMessage(byte[] data) { return requestWriter.decryptMessage(data); }
+	@Override public byte[] encryptMessage(String message) { return requestWriter.encryptMessage(message); }
+	@Override public String decryptMessage(byte[] data) { return requestWriter.decryptMessage(data); }
+	//endregion
 
+	//region Aux Methods
 	private void receiveMessage(MessageResponse message) {
 		if (chatBoxListener != null) Platform.runLater(() -> chatBoxListener.receiveMessage(message));
 	}
 	private void receiveSystemMessage(SystemMessageResponse message) {
 		if (chatBoxListener != null) Platform.runLater(() -> chatBoxListener.receiveSystemMessage(message));
 	}
+	//endregion
+
+	//region Getters
+	public int getId() { return id; }
+	public String getUsername() { return username; }
+	private boolean isConnected() { return isHost || isClient; }
+	//endregion
 
 	//region Setters
 	public void addNavigationListener(NavigationListener listener) { this.navigator.add(listener); }

@@ -20,8 +20,14 @@ public class MainController implements NavigationListener {
 		ConnectionService.getInstance().addNavigationListener(this);
 	}
 
-	@FXML public void switchToHome() { switchPage(Page.HOME); }
-	@FXML public void switchToChatbox() { switchPage(Page.CHATBOX); }
+	@FXML public void switchToHome() {
+		System.out.println("Switching to home");
+		switchPage(Page.HOME);
+	}
+	@FXML public void switchToChatbox() {
+		System.out.println("Switching to chatbox");
+		switchPage(Page.CHATBOX);
+	}
 
 	private void switchPage(Page page) {
 		try {

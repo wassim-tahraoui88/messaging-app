@@ -32,6 +32,7 @@ public class SidebarController implements NavigationListener, ConnectionListener
 	@Override
 	public void switchToChatbox() {
 		root.setVisible(true);
-		receiveConnection(new Connection(1, "John Doe"));
+		var connectionInstance = ConnectionService.getInstance();
+		receiveConnection(new Connection(connectionInstance.getId(), connectionInstance.getUsername()));
 	}
 }
