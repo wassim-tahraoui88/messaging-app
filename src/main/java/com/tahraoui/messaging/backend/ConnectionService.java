@@ -64,6 +64,10 @@ public class ConnectionService implements RequestWriter, ResponseReader {
 			this.requestWriter = host;
 			LOGGER.info("Host started on port {}.", port);
 		}
+		catch (GeneralSecurityException e) {
+			disconnect();
+			LOGGER.error(e.getMessage());
+		}
 		catch (Exception _) {
 			disconnect();
 			LOGGER.fatal("An error has occurred while starting the host.");
@@ -85,11 +89,11 @@ public class ConnectionService implements RequestWriter, ResponseReader {
 			this.requestWriter = client;
 			LOGGER.debug("Connected to server on port {} with id {}.", port, client.getId());
 		}
-		catch (AppException e) {
+		catch (AppException | GeneralSecurityException e) {
 			disconnect();
 			LOGGER.error(e.getMessage());
 		}
-		catch (IOException | GeneralSecurityException _) {
+		catch (IOException _) {
 			disconnect();
 			LOGGER.fatal("An error has occurred while connecting.");
 		}
