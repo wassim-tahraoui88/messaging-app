@@ -29,7 +29,12 @@ public class HomeController {
 
 	private boolean verifyPort() {
 		var port = numberField_hostPort.getText();
-		return !port.isBlank() && NetworkUtils.isPortAvailable(Integer.parseInt(port));
+		try {
+			return !port.isBlank() && NetworkUtils.isPortAvailable(Integer.parseInt(port));
+		}
+		catch (NumberFormatException _) {
+			return false;
+		}
 	}
 	private void handleVerifyPort() {
 		portStatus.hide();
@@ -45,9 +50,8 @@ public class HomeController {
 			ModalFactory.showError("Connection Error","Please fill in all fields...");
 			return;
 		}
-		var portNumber = Integer.parseInt(port);
 
-		if (verifyPort()) ConnectionService.getInstance().host(portNumber, new UserCredentials(username, password));
+		if (verifyPort()) ConnectionService.getInstance().host(Integer.parseInt(port), new UserCredentials(username, password));
 		else ModalFactory.showWarning("Connection Warning","Port number is invalid...");
 	}
 	private void handleJoin() {
@@ -58,7 +62,13 @@ public class HomeController {
 			ModalFactory.showError("Connection Error","Please fill in all fields...");
 			return;
 		}
-
-		ConnectionService.getInstance().join(Integer.parseInt(port), new UserCredentials(username, password));
+		try {
+			ConnectionService.getInstance().join(Integer.parseInt(port), new UserCredentials(username, password));
+		}
+		catch (NumberFormatException _) {
+			portStatus.setText("Invalid port number...");
+			var screenPosition = button_join.localToScreen(button_join.getBoundsInLocal());
+			portStatus.show(button_join, screenPosition.getMaxX(), screenPosition.getMinY());
+		}
 	}
 }
