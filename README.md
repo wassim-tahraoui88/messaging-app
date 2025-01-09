@@ -1,5 +1,5 @@
 ## To-Do List
-- [ ] Display all active members in a sidebar
+- [x] Display all active members in a sidebar
 - [ ] Messages encryption and decryption
 - [ ] Add a feature to send files
 - [ ] Add a feature to send images
