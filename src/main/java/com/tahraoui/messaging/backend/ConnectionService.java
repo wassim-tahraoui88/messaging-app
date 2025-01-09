@@ -68,7 +68,8 @@ public class ConnectionService implements RequestWriter, ResponseReader {
 			disconnect();
 			LOGGER.error(e.getMessage());
 		}
-		catch (Exception _) {
+		catch (Exception e) {
+			System.out.println(e.getMessage());
 			disconnect();
 			LOGGER.fatal("An error has occurred while starting the host.");
 		}

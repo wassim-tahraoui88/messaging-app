@@ -18,12 +18,14 @@ public class EncryptionUtils {
 	private static final String ENCRYPTION_ALGORITHM = "AES/CBC/PKCS5Padding";
 	private static final String KEY_SHARING_ALGORITHM = "RSA";
 
-	private static final int BIT_LENGTH = 256;
+	private static final int KEY_BIT_LENGTH = 256;
+	private static final int KEY_PAIR_BIT_LENGTH = 2024;
+
 	private static final int IV_BYTES = 16;
 
 	public static SecretKey generateKey() throws GeneralSecurityException {
 		var keyGenerator = KeyGenerator.getInstance(KEY_ALGORITHM);
-		keyGenerator.init(BIT_LENGTH);
+		keyGenerator.init(KEY_BIT_LENGTH);
 		return keyGenerator.generateKey();
 	}
 	public static byte[] encrypt(String message, SecretKey key, IvParameterSpec iv) throws GeneralSecurityException {
@@ -39,7 +41,7 @@ public class EncryptionUtils {
 
 	public static KeyPair generateKeyPair() throws GeneralSecurityException {
 		var keyPairGenerator = KeyPairGenerator.getInstance(KEY_SHARING_ALGORITHM);
-		keyPairGenerator.initialize(BIT_LENGTH);
+		keyPairGenerator.initialize(KEY_PAIR_BIT_LENGTH);
 		return keyPairGenerator.generateKeyPair();
 	}
 	public static byte[] encryptRSA(byte[] message, PublicKey key) throws GeneralSecurityException {
