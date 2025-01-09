@@ -18,5 +18,4 @@ public class Main extends Application {
 //		test();
 	}
 
-	public static void test() { }
 }
