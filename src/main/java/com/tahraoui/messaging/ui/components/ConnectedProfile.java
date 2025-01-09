@@ -1,23 +1,42 @@
 package com.tahraoui.messaging.ui.components;
 
 import com.tahraoui.messaging.model.Connection;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
 public class ConnectedProfile extends HBox {
 
 	private final int connectionId;
-	private final Label username;
+	private ProfileListener listener;
 
-	public ConnectedProfile(Connection user) {
+	public ConnectedProfile(Connection user, boolean kickable) {
 		this.connectionId = user.id();
 
-		this.username = new Label(user.username());
-		this.username.getStyleClass().add("username");
+		var username = new Label(user.username());
+		username.getStyleClass().add("username");
 
-		this.getStyleClass().add("profile");
+		var kickButton = new Button("Kick");
+		kickButton.getStyleClass().add("btn");
+		kickButton.setOnAction(_ -> handleKick());
+
+		setPadding(new Insets(0,0,0,5));
+		getStyleClass().add("profile");
 		getChildren().add(username);
+		if (kickable) getChildren().add(kickButton);
+	}
+
+	public void setKickHandler(ProfileListener listener) { this.listener = listener; }
+
+	private void handleKick() {
+		if (listener != null)
+			listener.kick();
 	}
 
 	public int getConnectionId() { return connectionId; }
+
+	public interface ProfileListener {
+		void kick();
+	}
 }

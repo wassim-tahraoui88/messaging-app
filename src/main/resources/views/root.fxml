@@ -6,6 +6,6 @@
             fx:controller="com.tahraoui.messaging.ui.controller.RootController">
     <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
     <top><fx:include source="header/header-view.fxml" fx:id="header"/></top>
-<!--    <left><fx:include source="sidebar/sidebar-view.fxml" fx:id="sidebar"/></left>-->
+    <left><fx:include source="sidebar/sidebar-view.fxml" fx:id="sidebar"/></left>
     <center><fx:include source="content/content-view.fxml" fx:id="content"/></center>
 </BorderPane>

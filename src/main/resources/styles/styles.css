@@ -22,6 +22,15 @@
   -fx-background-color: linear-gradient(from 25% 25% to 100% 100%, #eee, #bbb);
 }
 
+.list-title {
+  -fx-font-size: 18;
+  -fx-font-weight: bold;
+}
+
+.list-box {
+  -fx-background-color: white;
+}
+
 .chat-box {
   -fx-border-radius: 10;
   -fx-background-radius: 10;

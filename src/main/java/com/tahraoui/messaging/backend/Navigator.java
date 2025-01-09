@@ -21,14 +21,11 @@ public class Navigator {
 	}
 
 	public void switchToHome() {
-		System.out.println("Request to switch to home");
 		Platform.runLater(() -> {
 			for (var listener : navigationListeners) listener.switchToHome();
 		});
 	}
 	public void switchToChatbox() {
-		if (!ConnectionService.getInstance().isHost) return;
-		System.out.println("Request to switch to chatbox");
 		Platform.runLater(() -> {
 			for (var listener : navigationListeners) listener.switchToChatbox();
 		});

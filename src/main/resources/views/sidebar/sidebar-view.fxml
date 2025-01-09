@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Label?>
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" alignment="TOP_CENTER"
-      fx:id="root" fx:controller="com.tahraoui.messaging.ui.controller.SidebarController" visible="false">
-
-    <Label text="Connected users"/>
-    <VBox alignment="TOP_CENTER" spacing="25" VBox.vgrow="ALWAYS" fx:id="vbox_connectedUsers">
-
-    </VBox>
-</VBox>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:id="root" fx:controller="com.tahraoui.messaging.ui.controller.SidebarController">
+    <center>
+        <BorderPane>
+            <top>
+                <Label text="Users:" alignment="CENTER" textAlignment="CENTER" styleClass="list-title"/>
+            </top>
+            <center>
+                <ScrollPane fitToWidth="true">
+                    <VBox alignment="TOP_CENTER" spacing="5" styleClass="list-box" fx:id="vbox_connectedUsers"/>
+                </ScrollPane>
+            </center>
+        </BorderPane>
+    </center>
+</BorderPane>

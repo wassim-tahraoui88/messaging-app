@@ -1,7 +1,6 @@
 package com.tahraoui.messaging.ui.controller;
 
 import com.tahraoui.messaging.backend.ConnectionService;
-import com.tahraoui.messaging.backend.data.request.KickRequest;
 import com.tahraoui.messaging.backend.data.request.MessageRequest;
 import com.tahraoui.messaging.backend.data.response.MessageResponse;
 import com.tahraoui.messaging.backend.data.response.SystemMessageResponse;
@@ -43,9 +42,7 @@ public class ChatBoxController implements ChatBoxListener {
 	public void receiveMessage(MessageResponse message) {
 		var connectionInstance = ConnectionService.getInstance();
 		var messageItem = new Message(message.senderId(), message.senderName(), message.content(),
-				message.senderId() != connectionInstance.getId(),
-				connectionInstance.isHost);
-		if (connectionInstance.isHost) messageItem.setMessageListener(id -> connectionInstance.writeRequest(new KickRequest(id, message.senderName())));
+				message.senderId() != connectionInstance.getId(), connectionInstance.isHost);
 		vbox_messages.getChildren().add(messageItem);
 	}
 
