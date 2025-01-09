@@ -1,10 +1,10 @@
 package com.tahraoui.messaging.backend.host;
 
 import com.tahraoui.messaging.backend.data.RequestWriter;
-import com.tahraoui.messaging.backend.data.request.ConnectionRequest;
+import com.tahraoui.messaging.backend.data.request.ConnectionEstablishmentRequest;
 import com.tahraoui.messaging.backend.data.request.SerializableRequest;
 import com.tahraoui.messaging.backend.data.request.SystemMessageRequest;
-import com.tahraoui.messaging.backend.data.response.ConnectionResponse;
+import com.tahraoui.messaging.backend.data.response.ConnectionEstablishmentResponse;
 import com.tahraoui.messaging.model.exception.AppException;
 import com.tahraoui.messaging.model.exception.ConnectionFailedException;
 import com.tahraoui.messaging.model.exception.ReadingFailedException;
@@ -42,18 +42,18 @@ public class ClientHandler implements Runnable {
 
 		this.requestWriter = requestWriter;
 
-		var request = connect(password, new ConnectionResponse(p, g,true));
+		var request = connect(password, new ConnectionEstablishmentResponse(p, g,true));
 		this.id = request.id();
 		this.username = request.username();
 		this.requestWriter.writeRequest(new SystemMessageRequest("%s [%d] has joined the chat.".formatted(username, id)));
 	}
 
-	private ConnectionRequest connect(String password, ConnectionResponse response) throws AppException {
+	private ConnectionEstablishmentRequest connect(String password, ConnectionEstablishmentResponse response) throws AppException {
 		var success = false;
 		try {
-			var request = (ConnectionRequest) this.reader.readObject();
+			var request = (ConnectionEstablishmentRequest) this.reader.readObject();
 			if (request == null || !request.password().equals(password)) {
-				writer.writeObject(new ConnectionResponse(null,null,false));
+				writer.writeObject(new ConnectionEstablishmentResponse(null,null,false));
 				writer.flush();
 				throw new WrongPasswordException();
 			}
@@ -82,7 +82,6 @@ public class ClientHandler implements Runnable {
 			LOGGER.warn("Socket of Client id {} is closed.", writer.hashCode());
 		}
 		catch (ConnectionFailedException e) {
-			LOGGER.debug("{} [{}] has disconnected.", username, id);
 			disconnectionListener.onDisconnect(id);
 			requestWriter.writeRequest(new SystemMessageRequest("%s [%d] has disconnected.".formatted(username, id)));
 			Thread.currentThread().interrupt();

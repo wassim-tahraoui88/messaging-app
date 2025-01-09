@@ -5,6 +5,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -17,12 +19,20 @@ public class Message extends VBox {
 	private BooleanProperty received;
 
 	private final Label senderLabel, contentLabel;
+	private MessageListener messageListener;
 
-	public Message(String senderName, String text, boolean received) {
+	public Message(int senderId, String senderName, String text, boolean received, boolean isAdmin) {
 		this();
 
 		if (senderName == null || senderName.isBlank()) getChildren().remove(senderLabel);
 		else setSenderName(senderName);
+
+		if (isAdmin) this.senderLabel.setOnMouseClicked(event -> {
+			if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+				if (messageListener != null)
+					messageListener.kickUser(senderId);
+			}
+		});
 
 		setMessageContent(text);
 		setReceived(received);
@@ -31,6 +41,8 @@ public class Message extends VBox {
 	public Message() {
 		this.senderLabel = new Label();
 		this.senderLabel.getStyleClass().add("sender");
+		this.senderLabel.setTooltip(new Tooltip("Double click to kick from the chat."));
+
 
 		this.contentLabel = new Label();
 		this.contentLabel.setWrapText(true);
@@ -89,5 +101,11 @@ public class Message extends VBox {
 		var received = getReceived();
 		styleClass.add(received ? "received" : "sent");
 		styleClass.remove(received ? "sent" : "received");
+	}
+
+	public void setMessageListener(MessageListener messageListener) { this.messageListener = messageListener; }
+
+	public interface MessageListener {
+		void kickUser(int userId);
 	}
 }

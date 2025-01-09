@@ -4,6 +4,7 @@ import com.tahraoui.messaging.backend.data.RequestWriter;
 import com.tahraoui.messaging.backend.data.ResponseReader;
 import com.tahraoui.messaging.backend.data.UserCredentials;
 import com.tahraoui.messaging.backend.data.request.SerializableRequest;
+import com.tahraoui.messaging.backend.data.response.KickResponse;
 import com.tahraoui.messaging.backend.data.response.SerializableResponse;
 import com.tahraoui.messaging.model.exception.AppException;
 import org.apache.logging.log4j.LogManager;
@@ -38,5 +39,8 @@ public class Client implements RequestWriter, ResponseReader {
 	@Override
 	public void writeRequest(SerializableRequest request) { handler.writeRequest(request); }
 	@Override
-	public void readResponse(SerializableResponse response) { responseReader.readResponse(response); }
+	public void readResponse(SerializableResponse response) {
+		if (response instanceof KickResponse) handler.closeSocket();
+		else responseReader.readResponse(response);
+	}
 }

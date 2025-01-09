@@ -4,9 +4,9 @@ import com.tahraoui.messaging.backend.ConnectionService;
 import com.tahraoui.messaging.backend.data.RequestWriter;
 import com.tahraoui.messaging.backend.data.ResponseReader;
 import com.tahraoui.messaging.backend.data.UserCredentials;
-import com.tahraoui.messaging.backend.data.request.ConnectionRequest;
+import com.tahraoui.messaging.backend.data.request.ConnectionEstablishmentRequest;
 import com.tahraoui.messaging.backend.data.request.SerializableRequest;
-import com.tahraoui.messaging.backend.data.response.ConnectionResponse;
+import com.tahraoui.messaging.backend.data.response.ConnectionEstablishmentResponse;
 import com.tahraoui.messaging.backend.data.response.MessageResponse;
 import com.tahraoui.messaging.backend.data.response.SerializableResponse;
 import com.tahraoui.messaging.model.exception.AppException;
@@ -55,13 +55,13 @@ public class ClientListener implements Runnable, RequestWriter, ResponseReader {
 		this.publicKey = response.g().modPow(privateKey, response.p());
 	}
 
-	public ConnectionResponse connect(UserCredentials credentials) throws AppException {
+	public ConnectionEstablishmentResponse connect(UserCredentials credentials) throws AppException {
 		var success = false;
 		try {
-			this.writer.writeObject(new ConnectionRequest(this.id, credentials.username(), credentials.password()));
+			this.writer.writeObject(new ConnectionEstablishmentRequest(this.id, credentials.username(), credentials.password()));
 			this.writer.flush();
 
-			var response = (ConnectionResponse) this.reader.readObject();
+			var response = (ConnectionEstablishmentResponse) this.reader.readObject();
 
 			if (response == null) throw new ConnectionFailedException();
 			else if (!response.success()) throw new WrongPasswordException();
@@ -106,7 +106,7 @@ public class ClientListener implements Runnable, RequestWriter, ResponseReader {
 			closeSocket();
 		}
 	}
-	private void closeSocket() {
+	void closeSocket() {
 		try {
 			socket.close();
 		}

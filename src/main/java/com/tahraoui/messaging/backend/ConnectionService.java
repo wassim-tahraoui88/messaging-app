@@ -5,6 +5,7 @@ import com.tahraoui.messaging.backend.data.RequestWriter;
 import com.tahraoui.messaging.backend.data.ResponseReader;
 import com.tahraoui.messaging.backend.data.UserCredentials;
 import com.tahraoui.messaging.backend.data.request.SerializableRequest;
+import com.tahraoui.messaging.backend.data.response.KickResponse;
 import com.tahraoui.messaging.backend.data.response.MessageResponse;
 import com.tahraoui.messaging.backend.data.response.SerializableResponse;
 import com.tahraoui.messaging.backend.data.response.SystemMessageResponse;
@@ -27,14 +28,17 @@ public class ConnectionService implements ResponseReader {
 		return instance;
 	}
 
+	private int id;
 	private String username;
-	private boolean isHost, isClient;
+	public boolean isHost;
+	private boolean isClient;
 	private RequestWriter requestWriter;
 	private ChatBoxListener chatBoxListener;
 	private ContentListener contentListener;
 
 	private ConnectionService() {}
 
+	public int getId() { return id; }
 	public String getUsername() { return username; }
 
 	public boolean isConnected() { return isHost || isClient; }
@@ -49,6 +53,7 @@ public class ConnectionService implements ResponseReader {
 			var host = new Host(port, credentials);
 			host.setResponseReader(this);
 
+			this.id = 0;
 			this.username = host.getUsername();
 			this.contentListener.switchToChatbox();
 
@@ -71,6 +76,7 @@ public class ConnectionService implements ResponseReader {
 		try {
 			var client = new Client(port, credentials);
 			client.setResponseReader(this);
+			this.id = client.getId();
 			this.username = client.getUsername();
 			this.contentListener.switchToChatbox();
 
@@ -97,6 +103,8 @@ public class ConnectionService implements ResponseReader {
 		this.isHost = false;
 		this.isClient = false;
 
+		this.requestWriter = null;
+
 		this.username = null;
 		Platform.runLater(() -> contentListener.switchToHome());
 	}
@@ -104,6 +112,7 @@ public class ConnectionService implements ResponseReader {
 	@Override
 	public void readResponse(SerializableResponse response) {
 		if (response instanceof MessageResponse _response) receiveMessage(_response);
+		else if (response instanceof KickResponse) disconnect();
 		else if (response instanceof SystemMessageResponse _response) receiveSystemMessage(_response);
 	}
 

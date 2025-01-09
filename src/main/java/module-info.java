@@ -26,4 +26,5 @@ module com.tahraoui.messaging {
 	exports com.tahraoui.messaging.util;
 	opens com.tahraoui.messaging.ui.listener to javafx.fxml;
 	opens com.tahraoui.messaging.backend.data.request to javafx.fxml;
+	opens com.tahraoui.messaging.backend.data.response to javafx.fxml;
 }

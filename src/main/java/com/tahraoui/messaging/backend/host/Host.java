@@ -20,7 +20,6 @@ public class Host implements Runnable, RequestWriter, ResponseReader {
 	private static final int BIT_LENGTH = 2048;
 
 	private final int port;
-	private final int id;
 	private final String username;
 	private final String password;
 	private final ClientRequestHandler requestHandler;
@@ -38,7 +37,6 @@ public class Host implements Runnable, RequestWriter, ResponseReader {
 		this.publicKey = g.modPow(privateKey, p);
 
 		this.port = port;
-		this.id = 0;
 		this.username = credentials.username();
 		this.password = credentials.password();
 		this.requestHandler = new ClientRequestHandler();
@@ -55,7 +53,7 @@ public class Host implements Runnable, RequestWriter, ResponseReader {
 					handler.setDisconnectionListener(requestHandler::remove);
 					var id = handler.getId();
 					var threadName = "ClientHandler Thread - [%d]".formatted(id);
-					requestHandler.add(id, handler.getWriter());
+					requestHandler.add(id, handler);
 					new Thread(handler, threadName).start();
 				}
 				catch (AppException e) {
@@ -76,7 +74,6 @@ public class Host implements Runnable, RequestWriter, ResponseReader {
 
 	}
 
-	public int getId() { return id; }
 	public String getUsername() { return username; }
 	public BigInteger getP() { return p; }
 	public BigInteger getG() { return g; }

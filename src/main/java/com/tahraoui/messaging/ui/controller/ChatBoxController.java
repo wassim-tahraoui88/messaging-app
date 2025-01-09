@@ -1,6 +1,7 @@
 package com.tahraoui.messaging.ui.controller;
 
 import com.tahraoui.messaging.backend.ConnectionService;
+import com.tahraoui.messaging.backend.data.request.KickRequest;
 import com.tahraoui.messaging.backend.data.request.MessageRequest;
 import com.tahraoui.messaging.backend.data.response.MessageResponse;
 import com.tahraoui.messaging.backend.data.response.SystemMessageResponse;
@@ -33,16 +34,19 @@ public class ChatBoxController implements ChatBoxListener {
 	private void sendMessage() {
 		var message = textField_message.getText();
 		if (message.isEmpty()) return;
-		ConnectionService.getInstance().writeRequest(new MessageRequest(ConnectionService.getInstance().getUsername(), message));
+		var connectionInstance = ConnectionService.getInstance();
+		connectionInstance.writeRequest(new MessageRequest(connectionInstance.getId(), connectionInstance.getUsername(), message));
 		textField_message.clear();
 	}
 
 	@Override
 	public void receiveMessage(MessageResponse message) {
-		if (message.senderName().equals(ConnectionService.getInstance().getUsername()))
-			vbox_messages.getChildren().add(new Message(null, message.content(),false));
-		else
-			vbox_messages.getChildren().add(new Message(message.senderName(), message.content(),true));
+		var connectionInstance = ConnectionService.getInstance();
+		var messageItem = new Message(message.senderId(), message.senderName(), message.content(),
+				message.senderId() != connectionInstance.getId(),
+				connectionInstance.isHost);
+		if (connectionInstance.isHost) messageItem.setMessageListener(id -> connectionInstance.writeRequest(new KickRequest(id, message.senderName())));
+		vbox_messages.getChildren().add(messageItem);
 	}
 
 	@Override
