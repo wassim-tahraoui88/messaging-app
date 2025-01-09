@@ -27,6 +27,7 @@ public class ClientHandler implements Runnable {
 	private static final Logger LOGGER = LogManager.getLogger(ClientHandler.class);
 
 	private final int id;
+	private boolean isKicked;
 	private final String username;
 	private final Socket socket;
 	private final ObjectInputStream reader;
@@ -104,7 +105,7 @@ public class ClientHandler implements Runnable {
 			LOGGER.error("Failed to read request: {}.", e.getMessage());
 		}
 		catch (IOException e) {
-			throw new ConnectionFailedException();
+			if (!isKicked) throw new ConnectionFailedException();
 		}
 	}
 	private void closeSocket() {
@@ -123,6 +124,7 @@ public class ClientHandler implements Runnable {
 		catch (IOException _) { }
 	}
 
+	public void kick() { isKicked = true; }
 	public int getId() { return id; }
 	public ObjectOutput getWriter() { return writer; }
 	public void setDisconnectionListener(DisconnectionListener disconnectionListener) { this.disconnectionListener = disconnectionListener; }

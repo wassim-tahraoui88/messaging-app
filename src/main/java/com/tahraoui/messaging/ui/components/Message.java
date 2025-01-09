@@ -24,15 +24,17 @@ public class Message extends VBox {
 	public Message(int senderId, String senderName, String text, boolean received, boolean isAdmin) {
 		this();
 
-		if (senderName == null || senderName.isBlank()) getChildren().remove(senderLabel);
+		if (senderName == null || senderName.isBlank() || !received) getChildren().remove(senderLabel);
 		else setSenderName(senderName);
 
-		if (isAdmin) this.senderLabel.setOnMouseClicked(event -> {
-			if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-				if (messageListener != null)
-					messageListener.kickUser(senderId);
-			}
-		});
+		if (isAdmin) {
+			this.senderLabel.setTooltip(new Tooltip("Double click to kick from the chat."));
+			this.senderLabel.setOnMouseClicked(event -> {
+				if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+					if (messageListener != null) messageListener.kickUser(senderId);
+				}
+			});
+		}
 
 		setMessageContent(text);
 		setReceived(received);
@@ -41,7 +43,6 @@ public class Message extends VBox {
 	public Message() {
 		this.senderLabel = new Label();
 		this.senderLabel.getStyleClass().add("sender");
-		this.senderLabel.setTooltip(new Tooltip("Double click to kick from the chat."));
 
 
 		this.contentLabel = new Label();

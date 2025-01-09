@@ -20,8 +20,6 @@ import java.util.Map;
 
 public class ClientRequestHandler implements RequestWriter {
 
-	private record Handler(ObjectOutput writer) {}
-
 	private static final Logger LOGGER = LogManager.getLogger(ClientRequestHandler.class);
 	private final Map<Integer, ClientHandler> handlers;
 	private ResponseReader responseReader;
@@ -62,11 +60,12 @@ public class ClientRequestHandler implements RequestWriter {
 		broadcastResponse(response);
 	}
 	private void handleKickRequest(KickRequest request) {
+		var handler = handlers.get(request.userId());
+		handler.kick();
+		remove(handler.getId());
+		unicastResponse(new KickResponse(), handler.getWriter());
 
-		var response = new SystemMessageResponse("%s [%d] has been kicked from the chat.".formatted(request.username(), request.userId()));
-		unicastResponse(new KickResponse(), handlers.get(request.userId()).getWriter());
-		remove(request.userId());
-		broadcastResponse(response);
+		broadcastResponse(new SystemMessageResponse("%s [%d] has been kicked from the chat.".formatted(request.username(), request.userId())));
 	}
 	private void handleMessageRequest(MessageRequest request) {
 		var response = new MessageResponse(request.senderId(), request.senderName(), request.content());
