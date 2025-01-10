@@ -2,11 +2,14 @@ package com.tahraoui.messaging.backend.host;
 
 import com.tahraoui.messaging.backend.data.RequestWriter;
 import com.tahraoui.messaging.backend.data.ResponseReader;
+import com.tahraoui.messaging.model.Connection;
 import com.tahraoui.messaging.model.UserCredentials;
 import com.tahraoui.messaging.backend.data.request.SerializableRequest;
 import com.tahraoui.messaging.backend.data.response.SerializableResponse;
 import com.tahraoui.messaging.model.exception.AppException;
+import com.tahraoui.messaging.ui.listener.ConnectionListener;
 import com.tahraoui.messaging.util.EncryptionUtils;
+import javafx.application.Platform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,6 +32,7 @@ public class Host implements Runnable, RequestWriter, ResponseReader {
 	private final String password;
 	private final ClientRequestHandler requestHandler;
 	private ResponseReader responseReader;
+	private ConnectionListener connectionListener;
 
 	public Host(int port, UserCredentials credentials) throws GeneralSecurityException {
 		this.aesKey = EncryptionUtils.generateKey();
@@ -53,6 +57,7 @@ public class Host implements Runnable, RequestWriter, ResponseReader {
 					var id = handler.getId();
 					var threadName = "ClientHandler Thread - [%d]".formatted(id);
 					requestHandler.add(id, handler);
+					Platform.runLater(() -> connectionListener.receiveConnection(new Connection(id, handler.getUsername())));
 					new Thread(handler, threadName).start();
 				}
 				catch (AppException e) {
@@ -70,6 +75,7 @@ public class Host implements Runnable, RequestWriter, ResponseReader {
 
 	public String getUsername() { return username; }
 	public void setResponseReader(ResponseReader responseReader) { this.responseReader = responseReader; }
+	public void setConnectionListener(ConnectionListener connectionListener) { this.connectionListener = connectionListener; }
 
 	@Override
 	public void writeRequest(SerializableRequest request) { requestHandler.writeRequest(request); }

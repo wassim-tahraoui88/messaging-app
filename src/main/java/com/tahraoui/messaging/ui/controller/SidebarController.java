@@ -19,6 +19,7 @@ public class SidebarController implements NavigationListener, ConnectionListener
 
 	@FXML private void initialize() {
 		ConnectionService.getInstance().addNavigationListener(this);
+		ConnectionService.getInstance().setConnectionListener(this);
 		toggle = new SidebarToggle();
 		toggle.setOnMouseClicked(_ -> toggleSidebar());
 	}
@@ -31,7 +32,10 @@ public class SidebarController implements NavigationListener, ConnectionListener
 	@Override
 	public void receiveConnection(Connection connection) {
 		var connectedProfile = new ConnectedProfile(connection, connection.id() != 0);
-		if (connection.id() != 0) connectedProfile.setKickHandler(() -> ConnectionService.getInstance().writeRequest(new KickRequest(connection.id(), connection.username())));
+		if (connection.id() != 0) connectedProfile.setKickHandler(() -> {
+			ConnectionService.getInstance().writeRequest(new KickRequest(connection.id(), connection.username()));
+			removeConnection(connection.id());
+		});
 
 		vbox_connectedUsers.getChildren().add(connectedProfile);
 	}

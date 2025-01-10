@@ -11,7 +11,9 @@ import com.tahraoui.messaging.backend.data.response.SerializableResponse;
 import com.tahraoui.messaging.backend.data.response.SystemMessageResponse;
 import com.tahraoui.messaging.backend.host.Host;
 import com.tahraoui.messaging.model.exception.AppException;
+import com.tahraoui.messaging.ui.controller.SidebarController;
 import com.tahraoui.messaging.ui.listener.ChatBoxListener;
+import com.tahraoui.messaging.ui.listener.ConnectionListener;
 import com.tahraoui.messaging.ui.listener.NavigationListener;
 import javafx.application.Platform;
 import org.apache.logging.log4j.LogManager;
@@ -38,6 +40,7 @@ public class ConnectionService implements RequestWriter, ResponseReader {
 	private boolean isClient;
 	private RequestWriter requestWriter;
 	private ChatBoxListener chatBoxListener;
+	private ConnectionListener connectionListener;
 
 	private ConnectionService() {
 		this.navigator = new Navigator();
@@ -57,6 +60,7 @@ public class ConnectionService implements RequestWriter, ResponseReader {
 			this.id = 0;
 			this.username = host.getUsername();
 			this.requestWriter = host;
+			host.setConnectionListener(connectionListener);
 			new Thread(host,"Thread - Host").start();
 		}
 		catch (GeneralSecurityException e) {
@@ -147,5 +151,6 @@ public class ConnectionService implements RequestWriter, ResponseReader {
 	//region Setters
 	public void addNavigationListener(NavigationListener listener) { this.navigator.add(listener); }
 	public void setChatBoxListener(ChatBoxListener listener) { chatBoxListener = listener; }
+	public void setConnectionListener(ConnectionListener listener) { this.connectionListener = listener; }
 	//endregion
 }

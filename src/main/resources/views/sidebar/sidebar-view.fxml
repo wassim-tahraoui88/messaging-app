@@ -4,7 +4,8 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
-<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:id="root" fx:controller="com.tahraoui.messaging.ui.controller.SidebarController">
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:id="root"
+            minWidth="164" fx:controller="com.tahraoui.messaging.ui.controller.SidebarController">
     <center>
         <BorderPane>
             <top>
@@ -12,7 +13,7 @@
             </top>
             <center>
                 <ScrollPane fitToWidth="true">
-                    <VBox alignment="TOP_CENTER" spacing="5" styleClass="list-box" fx:id="vbox_connectedUsers"/>
+                    <VBox alignment="TOP_CENTER" spacing="2" styleClass="list-box" fx:id="vbox_connectedUsers"/>
                 </ScrollPane>
             </center>
         </BorderPane>

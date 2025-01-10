@@ -22,10 +22,8 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 import java.io.StreamCorruptedException;
-import java.math.BigInteger;
 import java.net.Socket;
 import java.security.KeyPair;
-import java.security.PublicKey;
 
 public class ClientHandler implements Runnable {
 
@@ -148,6 +146,7 @@ public class ClientHandler implements Runnable {
 
 	public void kick() { isKicked = true; }
 	public int getId() { return id; }
+	public String getUsername() { return username; }
 	public ObjectOutput getWriter() { return writer; }
 	public void setDisconnectionListener(DisconnectionListener disconnectionListener) { this.disconnectionListener = disconnectionListener; }
 }
