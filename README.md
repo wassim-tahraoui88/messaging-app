@@ -1,6 +1,6 @@
 ## To-Do List
-- [x] Messages encryption and decryption
-- [ ] Display all active members in a sidebar
+- [X] Messages encryption and decryption
+- [X] Display all active members in a sidebar
 - [ ] Add a feature to send files
 - [ ] Add a feature to send images
 - [ ] Add a feature to send emojis
