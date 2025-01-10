@@ -8,11 +8,7 @@ public class SidebarToggle extends Separator {
 
 	public SidebarToggle() {
 		setOrientation(Orientation.VERTICAL);
-		setStyle("-fx-background-color: #000000;" +
-				"-fx-padding: 0 0 0 0;" +
-				"-fx-margin: 0 0 0 0;" +
-				"-fx-min-width: 5;");
-
+		getStyleClass().add("sidebar-toggle");
 	}
 
 }

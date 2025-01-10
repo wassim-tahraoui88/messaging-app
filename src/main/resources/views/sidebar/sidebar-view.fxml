@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
+<?import com.tahraoui.gui.text.TLabel?>
+<?import javafx.geometry.Insets?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:id="root"
             minWidth="164" fx:controller="com.tahraoui.messaging.ui.controller.SidebarController">
     <center>
         <BorderPane>
             <top>
-                <Label text="Users:" alignment="CENTER" textAlignment="CENTER" styleClass="list-title"/>
+                <TLabel text="Users:" alignment="CENTER" textAlignment="CENTER" styleClass="list-title"/>
             </top>
             <center>
                 <ScrollPane fitToWidth="true">
+                    <BorderPane.margin>
+                        <Insets right="5"/>
+                    </BorderPane.margin>
                     <VBox alignment="TOP_CENTER" spacing="2" styleClass="list-box" fx:id="vbox_connectedUsers"/>
                 </ScrollPane>
             </center>

@@ -1,20 +1,29 @@
+* {
+	&:focused {
+		-fx-focus-color: gray;
+		-fx-faint-focus-color: transparent;
+	}
+}
+
 .label {
 	-fx-font-size: 16;
+	-fx-font-family: "Roboto Condensed";
 	-fx-font-weight: normal;
 
 }
-
 .title {
 	-fx-font-size: 20;
 	-fx-font-weight: bolder;
 }
 
-.separator-line {
-	-fx-pref-width: 1;
-	-fx-max-width: 1;
-	-fx-background-color: gray;
+.sidebar-toggle {
+	-fx-min-width: 5;
+	-fx-pref-width: 5;
+	-fx-padding: 0 5 0 0;
+	-fx-background-color: linear-gradient(to right, #ddd, #555);
 	-fx-border-color: transparent;
-	-fx-border-width: 1;
+	-fx-border-insets: 0 0 0 0;
+	-fx-border-width: 0;
 }
 
 .gradient-background {

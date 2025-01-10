@@ -1,10 +1,10 @@
 package com.tahraoui.messaging.ui.components;
 
+import com.tahraoui.gui.text.TLabel;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
@@ -18,7 +18,7 @@ public class Message extends VBox {
 	private StringProperty messageContent;
 	private BooleanProperty received;
 
-	private final Label senderLabel, contentLabel;
+	private final TLabel senderLabel, contentLabel;
 	private MessageListener messageListener;
 
 	public Message(int senderId, String senderName, String text, boolean received, boolean isAdmin) {
@@ -41,11 +41,11 @@ public class Message extends VBox {
 	}
 
 	public Message() {
-		this.senderLabel = new Label();
+		this.senderLabel = new TLabel();
 		this.senderLabel.getStyleClass().add("sender");
 
 
-		this.contentLabel = new Label();
+		this.contentLabel = new TLabel();
 		this.contentLabel.setWrapText(true);
 		this.contentLabel.getStyleClass().add("message");
 

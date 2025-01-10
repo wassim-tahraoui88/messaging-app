@@ -2,17 +2,19 @@
 
 <?import com.tahraoui.gui.icons.old.materialdesignicons.MaterialDesignIconView?>
 <?import com.tahraoui.gui.icons.old.octicons.OctIconView?>
+<?import com.tahraoui.gui.text.TLabel?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:id="header" fx:controller="com.tahraoui.messaging.ui.controller.HeaderController">
     <left>
-        <Label style="-fx-font-size: 28px; -fx-alignment: center; -fx-font-weight: 900;" fx:id="label">
+        <TLabel style="-fx-font-size: 28px; -fx-alignment: center; -fx-font-weight: 900;" fx:id="label">
             <BorderPane.margin>
                 <Insets top="5" right="5" bottom="5" left="5"/>
             </BorderPane.margin>
-        </Label>
+        </TLabel>
     </left>
     <center>
         <Separator/>

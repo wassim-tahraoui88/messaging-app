@@ -1,9 +1,9 @@
 package com.tahraoui.messaging.ui.components;
 
+import com.tahraoui.gui.text.TLabel;
 import com.tahraoui.messaging.model.Connection;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
 public class ConnectedProfile extends HBox {
@@ -14,7 +14,7 @@ public class ConnectedProfile extends HBox {
 	public ConnectedProfile(Connection user, boolean kickable) {
 		this.connectionId = user.id();
 
-		var username = new Label(user.username());
+		var username = new TLabel(user.username());
 		username.getStyleClass().add("username");
 
 		var kickButton = new Button("Kick");

@@ -1,5 +1,6 @@
 package com.tahraoui.messaging.ui.controller;
 
+import com.tahraoui.gui.text.TLabel;
 import com.tahraoui.messaging.backend.ConnectionService;
 import com.tahraoui.messaging.backend.data.request.MessageRequest;
 import com.tahraoui.messaging.backend.data.response.MessageResponse;
@@ -9,7 +10,6 @@ import com.tahraoui.messaging.ui.components.SystemMessage;
 import com.tahraoui.messaging.ui.listener.ChatBoxListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
@@ -19,7 +19,7 @@ public class ChatBoxController implements ChatBoxListener {
 	@FXML private VBox vbox_messages;
 	@FXML private TextField textField_message;
 	@FXML private Button btn_send;
-	@FXML private Label label_username;
+	@FXML private TLabel label_username;
 
 	@FXML private void initialize() {
 		btn_send.setOnAction(_ -> sendMessage());

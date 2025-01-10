@@ -5,15 +5,15 @@ import com.tahraoui.gui.component.MaximizeComponent;
 import com.tahraoui.gui.component.MinimizeComponent;
 import com.tahraoui.gui.icons.old.GlyphIcon;
 import com.tahraoui.gui.init.Bootstrapper;
+import com.tahraoui.gui.text.TLabel;
 import com.tahraoui.gui.util.Config;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 
 public class HeaderController {
 
 	@FXML private BorderPane header;
-	@FXML private Label label;
+	@FXML private TLabel label;
 	@FXML private GlyphIcon<?> minimize, maxIcon, restoreIcon;
 
 	@FXML public void initialize() {

@@ -1,22 +1,22 @@
 package com.tahraoui.messaging.ui.components;
 
+import com.tahraoui.gui.text.TLabel;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
 public class SystemMessage extends HBox {
 
 	private StringProperty text;
 
-	private final Label label;
+	private final TLabel label;
 
 	public SystemMessage(String text) {
 		this();
 		setText(text);
 	}
 	public SystemMessage() {
-		this.label = new Label();
+		this.label = new TLabel();
 		this.label.setWrapText(true);
 		this.label.getStyleClass().add("message");
 
